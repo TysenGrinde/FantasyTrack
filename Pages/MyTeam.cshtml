@@ -1,0 +1,83 @@
+﻿@page
+@model FantasySports.Pages.MyTeamModel
+@{
+    ViewData["Title"] = "My Team";
+}
+
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>@(Model.UserTeam?.Name ?? "My Team")</h2>
+        <a href="/Teams/Create" class="btn btn-outline-primary @(Model.UserTeam != null ? "d-none" : "")">
+            Create Team
+        </a>
+    </div>
+
+    @if (Model.UserTeam != null)
+    {
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Team Roster</h5>
+            </div>
+
+            <div class="card-body">
+                @if (Model.UserTeam.Athletes.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Sport</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var athlete in Model.UserTeam.Athletes)
+                                {
+                                    <tr>
+                                        <td>@athlete.Name</td>
+                                        <td>@athlete.Sport</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-danger">Remove</button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="d-flex justify-content-end mt-3">
+                        <a href="/Draft?teamId=@Model.UserTeam.Id" class="btn btn-success">
+                            <i class="fas fa-plus"></i> Add Athletes
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-info">
+                        <h5 class="alert-heading">No Athletes Yet!</h5>
+                        <p class="mb-0">Start by adding athletes to your team.</p>
+                        <div class="mt-3">
+                            <a href="/Draft?teamId=@Model.UserTeam.Id" class="btn btn-primary">
+                                Draft Athletes
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="card shadow">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-users fa-4x text-muted mb-4"></i>
+                <h4>You don't have a team yet!</h4>
+                <p class="text-muted mb-4">Create your team to start managing your fantasy roster</p>
+                <a href="/Teams/Create" class="btn btn-primary btn-lg">
+                    Create Team
+                </a>
+            </div>
+        </div>
+    }
+</div>
