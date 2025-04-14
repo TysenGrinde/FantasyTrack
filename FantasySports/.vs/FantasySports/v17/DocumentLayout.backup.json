@@ -1,0 +1,82 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\DSU Student\\Documents\\FantasyTrack2\\FantasySports\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{5664598C-5632-46DE-8F42-A18B67D2CC24}|FantasySports.csproj|c:\\users\\dsu student\\documents\\fantasytrack2\\fantasysports\\pages\\athlete.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5664598C-5632-46DE-8F42-A18B67D2CC24}|FantasySports.csproj|solutionrelative:pages\\athlete.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5664598C-5632-46DE-8F42-A18B67D2CC24}|FantasySports.csproj|c:\\users\\dsu student\\documents\\fantasytrack2\\fantasysports\\pages\\athlete.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{5664598C-5632-46DE-8F42-A18B67D2CC24}|FantasySports.csproj|solutionrelative:pages\\athlete.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5664598C-5632-46DE-8F42-A18B67D2CC24}|FantasySports.csproj|c:\\users\\dsu student\\documents\\fantasytrack2\\fantasysports\\pages\\draft.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{5664598C-5632-46DE-8F42-A18B67D2CC24}|FantasySports.csproj|solutionrelative:pages\\draft.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Athlete.cshtml",
+              "DocumentMoniker": "C:\\Users\\DSU Student\\Documents\\FantasyTrack2\\FantasySports\\Pages\\Athlete.cshtml",
+              "RelativeDocumentMoniker": "Pages\\Athlete.cshtml",
+              "ToolTip": "C:\\Users\\DSU Student\\Documents\\FantasyTrack2\\FantasySports\\Pages\\Athlete.cshtml",
+              "RelativeToolTip": "Pages\\Athlete.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-04-12T06:10:18.781Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Athlete.cshtml.cs",
+              "DocumentMoniker": "C:\\Users\\DSU Student\\Documents\\FantasyTrack2\\FantasySports\\Pages\\Athlete.cshtml.cs",
+              "RelativeDocumentMoniker": "Pages\\Athlete.cshtml.cs",
+              "ToolTip": "C:\\Users\\DSU Student\\Documents\\FantasyTrack2\\FantasySports\\Pages\\Athlete.cshtml.cs",
+              "RelativeToolTip": "Pages\\Athlete.cshtml.cs",
+              "ViewState": "AgIAABkAAAAAAAAAAAAkwCYAAAA8AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-12T06:11:17.422Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Draft.cshtml",
+              "DocumentMoniker": "C:\\Users\\DSU Student\\Documents\\FantasyTrack2\\FantasySports\\Pages\\Draft.cshtml",
+              "RelativeDocumentMoniker": "Pages\\Draft.cshtml",
+              "ToolTip": "C:\\Users\\DSU Student\\Documents\\FantasyTrack2\\FantasySports\\Pages\\Draft.cshtml",
+              "RelativeToolTip": "Pages\\Draft.cshtml",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAADIAAAAGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-04-12T06:05:28.976Z",
+              "EditorCaption": ""
+            }
+          ]
+        },
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{b1e99781-ab81-11d0-b683-00aa00a3ee26}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
