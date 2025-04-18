@@ -1,11 +1,9 @@
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using FantasySports.Data;
-using System;
 using FantasySports.Services;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using FantasySports.Models;
 
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions
 {
@@ -24,41 +22,61 @@ if (builder.Environment.IsDevelopment())
     builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 }
 
-// Add TeamService registration
-builder.Services.AddScoped<TeamService>();
+// Add SQLite database context
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"))
+    .EnableSensitiveDataLogging()
+    .EnableDetailedErrors());
 
-// Use in-memory stores
-builder.Services.AddTransient<IUserStore<IdentityUser>, InMemoryUserStore>();
-builder.Services.AddSingleton<InMemoryUserContext>();
-
-// Add in-memory Identity
-builder.Services.AddIdentityCore<IdentityUser>(options => {
+// Add Identity with Entity Framework stores - THIS REPLACES THE SEPARATE AUTHENTICATION CONFIG
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+{
     options.Password.RequireDigit = false;
     options.Password.RequiredLength = 4;
     options.Password.RequireNonAlphanumeric = false;
+    options.SignIn.RequireConfirmedAccount = false;
 })
-.AddSignInManager<SignInManager<IdentityUser>>()
+.AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
-
-// Add auth services
-builder.Services.AddAuthentication(options => {
-    options.DefaultScheme = IdentityConstants.ApplicationScheme;
-}).AddIdentityCookies();
 
 // Add authorization
 builder.Services.AddAuthorization();
 
-// Add MVC services
-builder.Services.AddRazorPages();
-
-
+// Add TeamService and LeagueService registration
+builder.Services.AddScoped<TeamService>();
+builder.Services.AddScoped<LeagueService>();
 
 var app = builder.Build();
 
+// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
-    // app.UseBrowserLink(); // Add this line
+
+    // Initialize and seed the database
+    using (var scope = app.Services.CreateScope())
+    {
+        var services = scope.ServiceProvider;
+        try
+        {
+            var context = services.GetRequiredService<AppDbContext>();
+            // Use Migrations instead of EnsureCreated for better control
+            context.Database.Migrate();
+
+            // Seed initial data if needed
+            // await SeedData.Initialize(services);
+        }
+        catch (Exception ex)
+        {
+            var logger = services.GetRequiredService<ILogger<Program>>();
+            logger.LogError(ex, "An error occurred seeding the DB.");
+        }
+    }
+}
+else
+{
+    app.UseExceptionHandler("/Error");
+    app.UseHsts();
 }
 
 app.UseHttpsRedirection();
@@ -66,7 +84,18 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
-app.MapRazorPages();  // Add this line
-app.MapControllers(); // For your API controllers
+app.MapRazorPages();
+app.MapControllers();
+
+app.MapGet("/testdb", async (AppDbContext db) =>
+{
+    var stats = new
+    {
+        Users = await db.Users.CountAsync(),
+        Teams = await db.Teams.CountAsync(),
+        Athletes = await db.Athletes.CountAsync()
+    };
+    return Results.Ok(stats);
+});
 
 app.Run();

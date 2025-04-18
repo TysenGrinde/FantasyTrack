@@ -47,3 +47,20 @@ button.accept-policy {
     white-space: nowrap;
     line-height: 60px;
 }
+
+/* User dropdown styling */
+.navbar-nav .dropdown-menu {
+    right: 0;
+    left: auto;
+}
+
+/* User icon spacing */
+.fa-user-circle {
+    margin-right: 5px;
+}
+
+/* Make dropdown items full width */
+.dropdown-item {
+    width: 100%;
+    text-align: left;
+}

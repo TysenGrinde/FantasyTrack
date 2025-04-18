@@ -1,28 +1,25 @@
-using FantasySports.Models;
-using FantasySports.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
+using FantasySports.Models;
 
 namespace FantasySports.Pages.Account
 {
     public class RegisterModel : PageModel
     {
-        private readonly InMemoryUserContext _context;
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly TeamService _teamService;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly ILogger<RegisterModel> _logger;
 
-        public RegisterModel(InMemoryUserContext context,
-                           UserManager<IdentityUser> userManager,
-                           SignInManager<IdentityUser> signInManager,
-                            TeamService teamService)
+        public RegisterModel(
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
+            ILogger<RegisterModel> logger)
         {
-            _context = context;
             _userManager = userManager;
             _signInManager = signInManager;
-            _teamService = teamService;
+            _logger = logger;
         }
 
         [BindProperty]
@@ -32,40 +29,58 @@ namespace FantasySports.Pages.Account
         {
             [Required]
             [EmailAddress]
+            [Display(Name = "Email")]
             public string Email { get; set; } = default!;
 
             [Required]
-            [StringLength(100, MinimumLength = 4)]
+            [Display(Name = "Username")]
+            public string Username { get; set; } = default!;
+
+            [Required]
+            [StringLength(100, MinimumLength = 6)]
+            [DataType(DataType.Password)]
+            [Display(Name = "Password")]
             public string Password { get; set; } = default!;
+        }
+
+        public IActionResult OnGet()
+        {
+            if (User?.Identity?.IsAuthenticated == true)
+            {
+                return RedirectToPage("/Index");
+            }
+            return Page();
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var user = new IdentityUser { UserName = Input.Email, Email = Input.Email };
-                var result = await _userManager.CreateAsync(user, Input.Password);
-
-                // Add debug logging
-                Console.WriteLine($"User creation {(result.Succeeded ? "succeeded" : "failed")}");
-                if (!result.Succeeded)
-                {
-                    foreach (var error in result.Errors)
-                    {
-                        Console.WriteLine($"Error: {error.Description}");
-                    }
-                }
-
-                if (result.Succeeded)
-                {
-                    await _signInManager.SignInAsync(user, isPersistent: false);
-                    return RedirectToPage("/MyTeam");
-                }
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
+                return Page();
             }
+
+            var user = new ApplicationUser
+            {
+                UserName = Input.Username,
+                Email = Input.Email
+            };
+
+            var result = await _userManager.CreateAsync(user, Input.Password);
+
+            if (result.Succeeded)
+            {
+                _logger.LogInformation("User created a new account with username: {Username}", Input.Username);
+
+                await _signInManager.SignInAsync(user, isPersistent: false);
+                return RedirectToPage("/Index");
+            }
+
+            foreach (var error in result.Errors)
+            {
+                _logger.LogWarning("User creation error: {Code} - {Description}", error.Code, error.Description);
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+
             return Page();
         }
     }

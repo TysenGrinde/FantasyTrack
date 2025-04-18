@@ -4,5 +4,9 @@
     ViewData["Title"] = "Logout";
 }
 
-<h2>You have been logged out</h2>
-<p><a asp-page="/Account/Login">Login again</a></p>
+<div class="text-center">
+    <h2>Are you sure you want to log out?</h2>
+    <form method="post">
+        <button type="submit" class="btn btn-danger">Logout</button>
+    </form>
+</div>

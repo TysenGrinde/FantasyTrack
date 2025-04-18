@@ -36,7 +36,7 @@ namespace FantasySports.Pages
             }
 
             await _httpClient.PostAsJsonAsync("https://localhost:5001/api/athletes",
-                new Athlete { Name = name, Sport = sport });
+                new Athlete { Name = name });
 
             return RedirectToPage();
         }
