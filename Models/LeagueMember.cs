@@ -9,5 +9,7 @@
         public League League { get; set; } = null!;
 
         public DateTime JoinedDate { get; set; } = DateTime.UtcNow;
+
+        public bool IsAdmin { get; set; } = false;
     }
 }

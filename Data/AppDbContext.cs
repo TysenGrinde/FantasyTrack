@@ -16,6 +16,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Team> Teams { get; set; }
     public DbSet<League> Leagues { get; set; }
     public DbSet<LeagueMember> LeagueMembers { get; set; }
+    public DbSet<Trade> Trades { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -63,5 +64,17 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
             .WithMany(t => t.Athletes)
             .HasForeignKey(a => a.TeamId)
             .OnDelete(DeleteBehavior.SetNull);
+        // Add this for Trade relationships
+        modelBuilder.Entity<Trade>()
+            .HasOne(t => t.ProposingTeam)
+            .WithMany()
+            .HasForeignKey(t => t.ProposingTeamId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Trade>()
+            .HasOne(t => t.ReceivingTeam)
+            .WithMany()
+            .HasForeignKey(t => t.ReceivingTeamId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

@@ -1,0 +1,11 @@
+﻿@page
+@model FantasySports.Pages.Leagues.CreateModel
+
+<form method="post">
+    <div class="form-group">
+        <label asp-for="League.Name"></label>
+        <input asp-for="League.Name" class="form-control" />
+        <span asp-validation-for="League.Name" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Create</button>
+</form>
