@@ -1,46 +1,32 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using FantasySports.Models;
 using System.Net.Http;
 using System.Net.Http.Json;
+using FantasySports.Data;
 
 namespace FantasySports.Pages
 {
     public class IndexModel : PageModel
     {
         private readonly HttpClient _httpClient;
+        private readonly AppDbContext _context;
 
-        public List<Athlete> Athletes { get; set; } = new();
-
-        public IndexModel(HttpClient httpClient)
+        public IndexModel(AppDbContext context, HttpClient httpClient)
         {
+            _context = context;
             _httpClient = httpClient;
         }
 
+        public List<Athlete> AvailableAthletes { get; set; } = new List<Athlete>();
+
         public async Task OnGetAsync()
         {
-            try
-            {
-                var response = await _httpClient.GetFromJsonAsync<List<Athlete>>("https://localhost:5001/api/athletes");
-                Athletes = response ?? new List<Athlete>();
-            }
-            catch (HttpRequestException)
-            {
-                Athletes = new List<Athlete>();
-            }
-        }
-
-        public async Task<IActionResult> OnPostAsync(string name, string sport)
-        {
-            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(sport))
-            {
-                return Page();
-            }
-
-            await _httpClient.PostAsJsonAsync("https://localhost:5001/api/athletes",
-                new Athlete { Name = name });
-
-            return RedirectToPage();
+            // Fetch athletes where TeamId is NULL
+            AvailableAthletes = await _context.Athletes
+                .Where(a => a.TeamId == null)
+                .ToListAsync();
         }
     }
 }

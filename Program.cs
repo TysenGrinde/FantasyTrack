@@ -46,6 +46,9 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<TeamService>();
 builder.Services.AddScoped<LeagueService>();
 
+// Add CSV import service
+builder.Services.AddScoped<CsvImportService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
