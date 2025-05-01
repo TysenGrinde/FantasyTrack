@@ -1,47 +1,50 @@
-using FantasySports.Data;
-using FantasySports.Models;
-using FantasySports.Services;
+// Pages/Leagues/Create.cshtml.cs
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-
+using FantasySports.Services;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 namespace FantasySports.Pages.Leagues
 {
+    [Authorize] // Requires user to be logged in
     public class CreateModel : PageModel
     {
-        private readonly AppDbContext _context;
         private readonly LeagueService _leagueService;
 
-        [BindProperty]
-        public LeagueInputModel League { get; set; } = new LeagueInputModel();
+        [BindProperty] // This attribute is REQUIRED
+        public string LeagueName { get; set; } = string.Empty;
 
-        public CreateModel(AppDbContext context, LeagueService leagueService)
+        public CreateModel(LeagueService leagueService)
         {
-            _context = context;
             _leagueService = leagueService;
         }
 
-        public IActionResult OnGet() => Page();
+        public void OnGet()
+        {
+            // Initialization if needed
+        }
 
         public async Task<IActionResult> OnPostAsync()
         {
-            if (!ModelState.IsValid) return Page();
-
-            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            if (userId == null) return Unauthorized();
-
-            var result = await _leagueService.CreateLeague(userId, League.Name);
-            if (!result.Succeeded)
+            if (!ModelState.IsValid)
             {
-                ModelState.AddModelError("", result.Error!);
                 return Page();
             }
 
-            return RedirectToPage("./Index");
-        }
-    }
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return Challenge(); // Redirect to login if not authenticated
+            }
 
-    public class LeagueInputModel
-    {
-        public string Name { get; set; } = "";
+            var result = await _leagueService.CreateLeague(userId, LeagueName);
+            if (!result.Succeeded)
+            {
+                ModelState.AddModelError(string.Empty, result.Error);
+                return Page();
+            }
+
+            return RedirectToPage("/Leagues/Index");
+        }
     }
 }

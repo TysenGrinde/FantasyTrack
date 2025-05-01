@@ -1,11 +1,20 @@
 ﻿@page
 @model FantasySports.Pages.Leagues.CreateModel
 
+<h2>Create New League</h2>
+
 <form method="post">
     <div class="form-group">
-        <label asp-for="League.Name"></label>
-        <input asp-for="League.Name" class="form-control" />
-        <span asp-validation-for="League.Name" class="text-danger"></span>
+        <label asp-for="LeagueName" class="control-label"></label>
+        <input asp-for="LeagueName" class="form-control" />
+        <span asp-validation-for="LeagueName" class="text-danger"></span>
     </div>
-    <button type="submit" class="btn btn-primary">Create</button>
+
+    <button type="submit" class="btn btn-primary mt-3">Create League</button>
 </form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

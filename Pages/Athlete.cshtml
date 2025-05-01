@@ -3,31 +3,62 @@
 @{
     Layout = "_Layout";
 }
-<h2>Athletes</h2>
+
+<h2 class="mb-4">Athletes</h2>
 
 <div class="list-group">
     @foreach (var athlete in Model.Athlete)
     {
-        <div class="list-group-item d-flex justify-content-between align-items-center">
-            <img src="@(athlete.ImageURL ?? "/images/placeholder.jpg")"
-                 alt="@athlete.Name"
-                 class="athlete-img" />
-            <div>
-                <h5 class="mb-1">@athlete.Name</h5>
-                <small class="text-muted"></small>
+        <div class="list-group-item">
+            <div class="row align-items-center gx-3">
+                <!-- Image Column -->
+                <div class="col-auto">
+                    <img src="@(athlete.ImageURL ?? "/images/placeholder.jpg")"
+                         alt="@athlete.Name"
+                         class="athlete-img rounded-circle" />
+                </div>
+
+                <!-- Name Column (flexible width) -->
+                <div class="col text-truncate">
+                    <h5 class="mb-0">@athlete.Name</h5>
+                </div>
+
+                <!-- Position Column (fixed width) -->
+                <div class="col-md-2 text-truncate">
+                    <span class="text-muted">@athlete.Position</span>
+                </div>
+
+                <!-- ID Column (pushed right) -->
+                <div class="col-auto ms-auto">
+                    <span class="badge bg-secondary rounded-pill">ID: @athlete.Id</span>
+                </div>
+
+                <!-- Status Column (pushed right) -->
+                <div class="col-auto">
+                    <span class="badge @(athlete.TeamId == null ? "bg-success" : "bg-warning text-dark") rounded-pill">
+                        @(athlete.TeamId == null ? "Available" : "Unavailable")
+                    </span>
+                </div>
             </div>
-            <p class="mb-0">@athlete.Position</p>
-            <span class="badge bg-secondary rounded-pill">ID: @athlete.Id</span>
-            <!-- If an Athletes TeamId == NULL then say "Free Agent", if not null say TeamId-->
-            <span class="badge bg-secondary rounded-pill">
-                @if (athlete.TeamId == null)
-                {
-                    <text>Available</text>
-                }
-                else
-                {
-                    <text>Unavailable</text>
-                }
         </div>
     }
 </div>
+
+<style>
+    .athlete-img {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+    }
+
+    .list-group-item {
+        padding: 1rem;
+    }
+
+    /* Responsive adjustments */
+    @@media (max-width: 768px) {
+        .col-md-2 {
+            display: none;
+        }
+    }
+</style>
