@@ -12,6 +12,7 @@ namespace FantasySports.Models
         // Team relationship (existing)
         public int? TeamId { get; set; }
         public Team? Team { get; set; }
+        public int SlotNumber { get; set; }
 
         // List of events (e.g., games, matches)
         public List<AthleteEvent> Events { get; set; } = new List<AthleteEvent>();

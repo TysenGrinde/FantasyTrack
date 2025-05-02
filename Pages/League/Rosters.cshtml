@@ -1,0 +1,21 @@
+﻿@page
+@model FantasySports.Pages.League.RostersModel
+
+<h2>Team Rosters</h2>
+
+@foreach (var team in Model.TeamRosters)
+{
+    <div class="team-roster">
+        <h3>@team.TeamName</h3>
+        <div class="athlete-grid">
+            @foreach (var athlete in team.Athletes)
+            {
+                <div class="athlete-card">
+                    <img src="@athlete.ImageURL" alt="@athlete.Name" />
+                    <div>@athlete.Name</div>
+                    <div>@athlete.Position</div>
+                </div>
+            }
+        </div>
+    </div>
+}

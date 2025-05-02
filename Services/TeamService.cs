@@ -222,14 +222,14 @@ namespace FantasySports.Services
             var offeredIds = trade.OfferedAthletes.Split(',').Select(int.Parse).ToList();
             var requestedIds = trade.RequestedAthletes.Split(',').Select(int.Parse).ToList();
 
-            // Move offered athletes to receiving team
+            // Move athletes from proposing team to receiving team
             foreach (var athleteId in offeredIds)
             {
                 var athlete = await _context.Athletes.FindAsync(athleteId);
                 if (athlete != null) athlete.TeamId = trade.ReceivingTeamId;
             }
 
-            // Move requested athletes to proposing team
+            // Move athletes from receiving team to proposing team
             foreach (var athleteId in requestedIds)
             {
                 var athlete = await _context.Athletes.FindAsync(athleteId);
@@ -245,9 +245,8 @@ namespace FantasySports.Services
 
             if (accept)
             {
-                // Swap athletes between teams
-                await ExecuteTrade(trade);
                 trade.Status = TradeStatus.Accepted;
+                await ExecuteTrade(trade);
             }
             else if (!string.IsNullOrEmpty(counterOffer))
             {

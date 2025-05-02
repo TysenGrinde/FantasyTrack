@@ -1,0 +1,49 @@
+﻿@page
+@model FantasySports.Pages.League.SettingsModel
+@{
+    ViewData["Title"] = "League Settings";
+}
+
+@if (!Model.IsCreator)
+{
+    <div class="alert alert-danger">
+        You must be the league creator to access these settings.
+    </div>
+}
+else
+{
+    <div class="settings-container">
+        <h1>League Settings</h1>
+
+        <form method="post">
+            <div class="form-group">
+                <label asp-for="Input.LeagueName" class="control-label">League Name</label>
+                <input asp-for="Input.LeagueName" class="form-control" />
+                <span asp-validation-for="Input.LeagueName" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Input.DraftDate" class="control-label">Draft Date</label>
+                <input asp-for="Input.DraftDate" type="datetime-local" class="form-control" />
+                <span asp-validation-for="Input.DraftDate" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Input.TradeLimit" class="control-label">Trade Limit (per week)</label>
+                <input asp-for="Input.TradeLimit" type="number" class="form-control" />
+                <span asp-validation-for="Input.TradeLimit" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mt-3">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <a asp-page="./Index" asp-route-leagueId="@Model.LeagueId" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+}
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

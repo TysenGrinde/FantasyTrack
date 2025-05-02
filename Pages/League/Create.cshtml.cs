@@ -4,20 +4,16 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using FantasySports.Services;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using FantasySports.Data;
+
 namespace FantasySports.Pages.Leagues
 {
     [Authorize] // Requires user to be logged in
-    public class CreateModel : PageModel
+    public class CreateModel(LeagueService _leagueService) : PageModel
     {
-        private readonly LeagueService _leagueService;
 
         [BindProperty] // This attribute is REQUIRED
         public string LeagueName { get; set; } = string.Empty;
-
-        public CreateModel(LeagueService leagueService)
-        {
-            _leagueService = leagueService;
-        }
 
         public void OnGet()
         {

@@ -1,0 +1,29 @@
+﻿@page
+@model FantasySports.Pages.League.IndexModel
+@{
+    ViewData["Title"] = "League Home";
+}
+
+<div class="league-header">
+    <h1>@Model.CurrentLeague.Name</h1>
+    <div class="league-actions">
+        <a asp-page="./Members" asp-route-leagueId="@Model.LeagueId" class="btn btn-secondary">Members</a>
+        <a asp-page="./Rosters" asp-route-leagueId="@Model.LeagueId" class="btn btn-secondary">Rosters</a>
+        <a asp-page="./Schedule" asp-route-leagueId="@Model.LeagueId" class="btn btn-secondary">Schedule</a>
+        @if (User.Identity.IsAuthenticated)
+        {
+            <a asp-page="./Settings" asp-route-leagueId="@Model.LeagueId" class="btn btn-primary">Settings</a>
+        }
+    </div>
+</div>
+
+<div class="league-content">
+    <div class="upcoming-events">
+        <h3>Upcoming Events</h3>
+        <!-- Placeholder for events calendar -->
+    </div>
+    <div class="recent-activity">
+        <h3>Recent Activity</h3>
+        <!-- Placeholder for activity feed -->
+    </div>
+</div>

@@ -78,3 +78,60 @@ body {
     border-radius: 5px;
     background: white;
 }
+
+/* League Pages */
+.league-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.league-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+/* Rosters */
+.athlete-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+}
+
+.athlete-slot {
+    border: 1px solid #ddd;
+    padding: 1rem;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.slot-number {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.athlete-info img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* Schedule */
+.meet-card {
+    border: 1px solid #eee;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+}
+
+.meet-date {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.matchup {
+    padding: 0.5rem;
+    border-bottom: 1px solid #f5f5f5;
+}

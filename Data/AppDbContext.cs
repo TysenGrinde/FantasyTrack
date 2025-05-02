@@ -16,7 +16,8 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Team> Teams { get; set; }
     public DbSet<League> Leagues { get; set; }
     public DbSet<LeagueMember> LeagueMembers { get; set; }
-    public DbSet<Trade> Trades { get; set; }
+    public DbSet<MeetSchedule> MeetSchedules { get; set; }
+    public DbSet<Trade> Trades { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -28,6 +29,12 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
             .WithOne(u => u.CreatedLeague)
             .HasForeignKey<League>(l => l.CreatorId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        // League to Teams (one-to-many)
+        modelBuilder.Entity<League>()
+            .HasMany(l => l.Teams)
+            .WithOne(t => t.League)
+            .HasForeignKey(t => t.LeagueId);
 
         // League Members (many-to-many with join table)
         modelBuilder.Entity<LeagueMember>()
@@ -44,6 +51,11 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
             .WithMany(l => l.Members)
             .HasForeignKey(lm => lm.LeagueId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<LeagueMember>()
+            .HasOne(lm => lm.Team)
+            .WithMany()
+            .HasForeignKey(lm => lm.TeamId);
 
         // Team constraints
         modelBuilder.Entity<Team>()
@@ -64,6 +76,11 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
             .WithMany(t => t.Athletes)
             .HasForeignKey(a => a.TeamId)
             .OnDelete(DeleteBehavior.SetNull);
+
+        modelBuilder.Entity<Athlete>()
+            .Property(a => a.SlotNumber)
+            .HasDefaultValue(0);
+
         // Add this for Trade relationships
         modelBuilder.Entity<Trade>()
             .HasOne(t => t.ProposingTeam)

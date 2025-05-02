@@ -1,0 +1,12 @@
+﻿@page
+@model FantasySports.Pages.League.ScheduleModel
+
+<h2>League Schedule</h2>
+
+@foreach (var meet in Model.UpcomingMeets)
+{
+    <div class="meet-card">
+        <h4>@meet.Date.ToString("MMMM dd, yyyy")</h4>
+        <p>@meet.Location</p>
+    </div>
+}

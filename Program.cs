@@ -89,6 +89,10 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapRazorPages();
 app.MapControllers();
+app.MapControllerRoute(
+    name: "league",
+    pattern: "League/{leagueId:int}/{action=Index}",
+    defaults: new { page = "/League/Index" });
 
 app.MapGet("/testdb", async (AppDbContext db) =>
 {
