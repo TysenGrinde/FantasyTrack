@@ -1,0 +1,130 @@
+﻿@page
+@model FantasySports.Pages.Meets.DetailsModel
+@{
+    Layout = "_Layout";
+}
+
+@if (Model.MeetNotFound)
+{
+    <div class="alert alert-danger">
+        <h4>Meet Not Found</h4>
+        <p>The requested meet could not be found.</p>
+        <a asp-page="./Index" class="btn btn-primary">Back to Meets List</a>
+    </div>
+}
+else
+{
+    <h2>@Model.Meet.Name - @Model.Meet.Date.ToString("MMMM dd, yyyy")</h2>
+
+    @if (TempData["FinalizeError"] != null)
+    {
+        <div class="alert alert-danger">
+            <h4>Finalization Failed</h4>
+            <p>@TempData["FinalizeError"]</p>
+        </div>
+    }
+
+    @if (!Model.Meet.IsCompleted)
+    {
+        <form method="post" asp-page-handler="Finalize" class="mb-3">
+            <button type="submit" class="btn btn-danger">Finalize Meet</button>
+            <small class="text-muted">Warning: Cannot edit after finalizing</small>
+
+            @if (!Model.Meet.Events.All(e => e.Performances.Any()))
+            {
+                <div class="alert alert-warning mt-2">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Some events don't have performances recorded yet!
+                </div>
+            }
+        </form>
+    }
+    else
+    {
+        <div class="alert alert-success">
+            <i class="fas fa-check-circle"></i>
+            This meet has been finalized on @Model.Meet.TeamScores.First().DateCreated.ToString("g")
+        </div>
+    }
+
+@foreach (var meetEvent in Model.Meet.Events.OrderBy(e => e.Event.Name))
+{
+    <div class="card mb-3">
+        <div class="card-header">
+            <h3>@meetEvent.Event.Name</h3>
+            <a asp-page="./EnterPerformance"
+               asp-route-MeetId="@Model.Meet.Id"
+               asp-route-EventId="@meetEvent.Id"
+               class="btn btn-sm btn-outline-primary">
+                Add Performance
+            </a>
+        </div>
+        <div class="card-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Position</th>
+                        <th>Athlete</th>
+                        <th>Team</th>
+                        <th>Result</th>
+                        @if (Model.Meet.IsCompleted)
+                        {
+                            <th>Points</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        var ordered = meetEvent.Event.Unit == "seconds"
+                        ? meetEvent.Performances.OrderBy(p => p.Result)
+                        : meetEvent.Performances.OrderByDescending(p => p.Result);
+                    }
+                    @foreach (var perf in ordered)
+                    {
+                        <tr>
+                            <td>@(perf.PointsEarned > 0 ? perf.PointsEarned + " pts" : "-")</td>
+                            <td>@perf.Athlete.Name</td>
+                            <td>@(perf.Athlete.Team?.Name ?? "Unaffiliated")</td>
+                            <td>@perf.Result @meetEvent.Event.Unit</td>
+                            @if (Model.Meet.IsCompleted)
+                            {
+                                <td>@perf.PointsEarned</td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+@if (Model.Meet.IsCompleted)
+{
+    <div class="card">
+        <div class="card-header">
+            <h3>Final Team Standings</h3>
+        </div>
+        <div class="card-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Place</th>
+                        <th>Team</th>
+                        <th>Total Points</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var score in Model.Meet.TeamScores.OrderBy(s => s.Placement))
+                    {
+                        <tr>
+                            <td>@score.Placement</td>
+                            <td>@score.Team.Name</td>
+                            <td>@score.TotalPoints</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+}

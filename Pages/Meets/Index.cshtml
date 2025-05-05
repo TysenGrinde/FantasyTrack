@@ -1,0 +1,39 @@
+﻿@page
+@model FantasySports.Pages.Meets.IndexModel
+@{
+    Layout = "_Layout";
+}
+
+<h2>Track Meets</h2>
+
+<h3 class="mt-4">Upcoming Meets</h3>
+<div class="list-group">
+    @foreach (var meet in Model.UpcomingMeets)
+    {
+        <a asp-page="./Details" asp-route-id="@meet.Id" class="list-group-item list-group-item-action">
+            <h5>@meet.Name</h5>
+            <p class="mb-1">@meet.Date.ToString("MMMM dd, yyyy")</p>
+            <small>@meet.Events.Count events</small>
+        </a>
+    }
+</div>
+
+<h3 class="mt-4">Completed Meets</h3>
+<div class="list-group">
+    @foreach (var meet in Model.CompletedMeets)
+    {
+        <a asp-page="./Details" asp-route-id="@meet.Id" class="list-group-item list-group-item-action">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <h5>@meet.Name</h5>
+                    <p class="mb-1">@meet.Date.ToString("MMMM dd, yyyy")</p>
+                </div>
+                <div>
+                    <span class="badge bg-primary">Winner: @meet.TeamScores.OrderBy(s => s.Placement).First().Team.Name</span>
+                </div>
+            </div>
+        </a>
+    }
+</div>
+
+<a asp-page="./Create" class="btn btn-primary mt-3">Create New Meet</a>

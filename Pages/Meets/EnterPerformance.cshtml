@@ -1,0 +1,52 @@
+﻿@page
+@model FantasySports.Pages.Meets.EnterPerformanceModel
+@{
+    Layout = "_Layout";
+}
+
+<h2>Enter Performance - @Model.Meet.Name</h2>
+<h4>@Model.MeetEvent.Event.Name (@Model.MeetEvent.Event.Unit)</h4>
+
+<form method="post">
+    <input type="hidden" asp-for="MeetId" />
+    <input type="hidden" asp-for="EventId" />
+
+    <div class="form-group mb-3">
+        <label asp-for="AthleteId" class="control-label">Athlete</label>
+        <select asp-for="AthleteId" class="form-control"
+                asp-items="@(new SelectList(Model.AvailableAthletes, "Id", "Name"))">
+            <option value="">-- Select Athlete --</option>
+        </select>
+        <span asp-validation-for="AthleteId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="Result" class="control-label">Result (@Model.MeetEvent.Event.Unit)</label>
+        <input asp-for="Result" class="form-control" step="0.01" />
+        <span asp-validation-for="Result" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Record Performance</button>
+    <a asp-page="./Details" asp-route-id="@Model.MeetId" class="btn btn-secondary">Back to Meet</a>
+</form>
+
+<h5 class="mt-4">Recorded Performances</h5>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Athlete</th>
+            <th>Result</th>
+            <th>Team</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var perf in Model.MeetEvent.Performances.OrderBy(p => p.Result))
+        {
+            <tr>
+                <td>@perf.Athlete.Name</td>
+                <td>@perf.Result @Model.MeetEvent.Event.Unit</td>
+                <td>@(perf.Athlete.Team?.Name ?? "Unaffiliated")</td>
+            </tr>
+        }
+    </tbody>
+</table>

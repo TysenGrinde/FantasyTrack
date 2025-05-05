@@ -18,6 +18,11 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<LeagueMember> LeagueMembers { get; set; }
     public DbSet<MeetSchedule> MeetSchedules { get; set; }
     public DbSet<Trade> Trades { get; set; } = null!;
+    public DbSet<Meet> Meets { get; set; }
+    public DbSet<Event> Events { get; set; }
+    public DbSet<MeetEvent> MeetEvents { get; set; }
+    public DbSet<AthletePerformance> AthletePerformances { get; set; }
+    public DbSet<TeamScore> TeamScores { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -84,5 +89,33 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
             .WithMany()
             .HasForeignKey(t => t.ReceivingTeamId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        // Meet relationships
+        modelBuilder.Entity<Meet>()
+            .HasMany(m => m.Events)
+            .WithOne(me => me.Meet)
+            .HasForeignKey(me => me.MeetId);
+
+        modelBuilder.Entity<Meet>()
+            .HasMany(m => m.TeamScores)
+            .WithOne(ts => ts.Meet)
+            .HasForeignKey(ts => ts.MeetId);
+
+        // MeetEvent relationships
+        modelBuilder.Entity<MeetEvent>()
+            .HasOne(me => me.Event)
+            .WithMany()
+            .HasForeignKey(me => me.EventId);
+
+        modelBuilder.Entity<MeetEvent>()
+            .HasMany(me => me.Performances)
+            .WithOne(p => p.MeetEvent)
+            .HasForeignKey(p => p.MeetEventId);
+
+        // TeamScore relationships
+        modelBuilder.Entity<TeamScore>()
+            .HasOne(ts => ts.Team)
+            .WithMany()
+            .HasForeignKey(ts => ts.TeamId);
     }
 }

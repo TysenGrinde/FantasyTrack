@@ -49,6 +49,13 @@ builder.Services.AddScoped<LeagueService>();
 // Add CSV import service
 builder.Services.AddScoped<CsvImportService>();
 
+// Add MeetService and MeetScoringService registration
+builder.Services.AddScoped<MeetService>();
+builder.Services.AddScoped<MeetScoringService>();
+
+// Add AthleteService registration
+builder.Services.AddScoped<AthleteService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -104,5 +111,20 @@ app.MapGet("/testdb", async (AppDbContext db) =>
     };
     return Results.Ok(stats);
 });
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<AppDbContext>();
+        DbInitializer.Initialize(context);
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while seeding the database.");
+    }
+}
 
 app.Run();

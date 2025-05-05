@@ -1,0 +1,40 @@
+﻿@page
+@model FantasySports.Pages.Meets.CreateModel
+@{
+    Layout = "_Layout";
+}
+
+<h2>Create New Meet</h2>
+
+<form method="post">
+    <div class="form-group mb-3">
+        <label asp-for="MeetName" class="control-label"></label>
+        <input asp-for="MeetName" class="form-control" />
+        <span asp-validation-for="MeetName" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="MeetDate" class="control-label"></label>
+        <input asp-for="MeetDate" class="form-control" />
+        <span asp-validation-for="MeetDate" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <h4>Select Events</h4>
+        @foreach (var evt in Model.AvailableEvents)
+        {
+            <div class="form-check">
+                <input class="form-check-input"
+                       type="checkbox"
+                       id="event-@evt.Id"
+                       name="SelectedEventIds"
+                       value="@evt.Id">
+                <label class="form-check-label" for="event-@evt.Id">
+                    @evt.Name (@evt.Unit)
+                </label>
+            </div>
+        }
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create Meet</button>
+</form>
