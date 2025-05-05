@@ -23,21 +23,29 @@
                     <h5 class="mb-0">@athlete.Name</h5>
                 </div>
 
-                <!-- Position Column (fixed width) -->
-                <div class="col-md-2 text-truncate">
-                    <span class="text-muted">@athlete.Position</span>
-                </div>
-
-                <!-- ID Column (pushed right) -->
-                <div class="col-auto ms-auto">
+                <!-- ID Column -->
+                <div class="col-auto">
                     <span class="badge bg-secondary rounded-pill">ID: @athlete.Id</span>
                 </div>
 
-                <!-- Status Column (pushed right) -->
+                @if (athlete.TeamId != null)
+                {
+                    <!-- Team ID Column -->
+                    <div class="col-auto">
+                        <span class="badge bg-secondary rounded-pill">Team: @athlete.TeamId</span>
+                    </div>
+                }
+
+                <!-- Status Column -->
                 <div class="col-auto">
                     <span class="badge @(athlete.TeamId == null ? "bg-success" : "bg-warning text-dark") rounded-pill">
                         @(athlete.TeamId == null ? "Available" : "Unavailable")
                     </span>
+                </div>
+
+                <!-- Position Box (far right) -->
+                <div class="col-auto position-box">
+                    <span>@athlete.Position</span>
                 </div>
             </div>
         </div>
@@ -55,10 +63,36 @@
         padding: 1rem;
     }
 
+    .position-box {
+        min-width: 150px;
+        height: 30px;
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-left: auto; /* Pushes to far right */
+        padding: 0 10px;
+    }
+
+        .position-box span {
+            font-weight: 500;
+            color: #495057;
+            text-align: center;
+        }
+
     /* Responsive adjustments */
     @@media (max-width: 768px) {
-        .col-md-2 {
-            display: none;
+        .position-box {
+            min-width: 60px;
+            height: 25px;
+            font-size: 0.8rem;
+        }
+
+        .athlete-img {
+            width: 40px;
+            height: 40px;
         }
     }
 </style>

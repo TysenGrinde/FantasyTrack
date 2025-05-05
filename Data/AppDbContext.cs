@@ -25,10 +25,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
 
         // League Creator (one-to-one)
         modelBuilder.Entity<League>()
-            .HasOne(l => l.Creator)
-            .WithOne(u => u.CreatedLeague)
-            .HasForeignKey<League>(l => l.CreatorId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .HasIndex(l => l.CreatorId);
 
         // League to Teams (one-to-many)
         modelBuilder.Entity<League>()
@@ -62,12 +59,6 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
             .HasOne(t => t.League)
             .WithMany(l => l.Teams)
             .HasForeignKey(t => t.LeagueId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        modelBuilder.Entity<Team>()
-            .HasOne(t => t.Owner)
-            .WithMany(u => u.Teams)
-            .HasForeignKey(t => t.OwnerId)
             .OnDelete(DeleteBehavior.Cascade);
 
         // Athlete constraints

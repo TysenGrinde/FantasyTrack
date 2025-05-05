@@ -10,18 +10,20 @@ namespace FantasySports.Models
         [Required]
         public string Name { get; set; } = string.Empty;
 
-        public string CreatorId { get; set; } = null!;
+        public string? CreatorId { get; set; }
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
         public DateTime? DraftDate { get; set; }
         public int TradeLimit { get; set; } = 3;
         public int TradeReviewPeriodHours { get; set; } = 24;
 
         public string DraftOrder { get; set; } = ""; // JSON or comma-separated team IDs
+        public string? InviteCode { get; set; } // JSON or comma-separated athlete IDs
         public bool IsDraftStarted { get; set; } = false;
         public bool IsDraftComplete { get; set; } = false;
 
         // Navigation properties
-        public ApplicationUser Creator { get; set; } = null!;
+        [ForeignKey("CreatorId")]
+        public ApplicationUser? Creator { get; set; } = null!;
         public ICollection<LeagueMember> Members { get; set; } = new List<LeagueMember>();
         public ICollection<Team> Teams { get; set; } = new List<Team>();
         public ICollection<MeetSchedule> MeetSchedules { get; set; } = new List<MeetSchedule>();

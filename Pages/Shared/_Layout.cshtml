@@ -26,12 +26,6 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-page="/Athlete">Athletes</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-page="/Teams">Teams</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-page="/League/Create">Create League</a>
-                        </li>
                         <li>
 							<a class="nav-link text-dark" asp-page="/League/Index">League Home</a>
                         </li>
@@ -44,7 +38,7 @@
                                     <i class="fas fa-user-circle me-1"></i> @User.Identity.Name
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a class="dropdown-item" asp-page="/MyTeam">My Team</a></li>
+                                    <li><a class="dropdown-item" asp-page="/League/MyTeam">My Team</a></li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li>
                                         <form class="form-inline" asp-page="/Account/Logout" method="post">

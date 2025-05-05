@@ -151,7 +151,6 @@ namespace FantasySports.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("CreatorId")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("DraftDate")
@@ -159,6 +158,9 @@ namespace FantasySports.Migrations
 
                     b.Property<string>("DraftOrder")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("InviteCode")
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsDraftComplete")
@@ -240,7 +242,17 @@ namespace FantasySports.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("LeagueId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("LogoUrl")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Losses")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
@@ -248,8 +260,10 @@ namespace FantasySports.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("OwnerId")
-                        .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("Wins")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -459,9 +473,7 @@ namespace FantasySports.Migrations
                 {
                     b.HasOne("FantasySports.Models.ApplicationUser", "Creator")
                         .WithOne("CreatedLeague")
-                        .HasForeignKey("FantasySports.Models.League", "CreatorId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("FantasySports.Models.League", "CreatorId");
 
                     b.Navigation("Creator");
                 });
@@ -514,9 +526,7 @@ namespace FantasySports.Migrations
 
                     b.HasOne("FantasySports.Models.ApplicationUser", "Owner")
                         .WithMany("Teams")
-                        .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("OwnerId");
 
                     b.Navigation("League");
 

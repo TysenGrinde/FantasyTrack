@@ -1,29 +1,290 @@
 ﻿@page
 @model FantasySports.Pages.League.IndexModel
+
 @{
-    ViewData["Title"] = "League Home";
+    ViewData["Title"] = Model.CurrentLeague?.Name ?? "League Home";
+    Layout = "_Layout";
 }
 
-<div class="league-header">
-    <h1>@Model.CurrentLeague.Name</h1>
-    <div class="league-actions">
-        <a asp-page="./Members" asp-route-leagueId="@Model.LeagueId" class="btn btn-secondary">Members</a>
-        <a asp-page="./Rosters" asp-route-leagueId="@Model.LeagueId" class="btn btn-secondary">Rosters</a>
-        <a asp-page="./Schedule" asp-route-leagueId="@Model.LeagueId" class="btn btn-secondary">Schedule</a>
-        @if (User.Identity.IsAuthenticated)
+<div class="container">
+    @if (Model.HasLeague)
+    {
+        <h1>@Model.CurrentLeague.Name</h1>
+
+        @if (Model.CurrentLeague?.Teams?.Any() == true)
         {
-            <a asp-page="./Settings" asp-route-leagueId="@Model.LeagueId" class="btn btn-primary">Settings</a>
-        }
-    </div>
+        <h3 class="mt-4 mb-4">Teams</h3>
+
+        <!-- 4x2 Grid Container -->
+        <div class="team-grid">
+            @{
+                var displayTeams = Model.CurrentLeague.Teams.Take(8).ToList();
+            }
+
+            @for (int row = 0; row < 2; row++)
+            {
+                <div class="team-row">
+                    @for (int col = 0; col < 4; col++)
+                    {
+                        var index = row * 4 + col;
+                        if (index < displayTeams.Count)
+                        {
+                            var team = displayTeams[index];
+                            <div class="team-col">
+                                <div class="card team-card h-100">
+                                    <!-- Added h-100 -->
+                                    <div class="row g-0 h-100">
+                                        <!-- Added h-100 -->
+                                        <!-- Left Side - Team Info -->
+                                        <div class="col-md-6 d-flex flex-column">
+                                            <div class="flex-grow-0">
+                                                <!-- Logo container -->
+                                                <img src="@(team.LogoUrl ?? "/images/teams/default.png")"
+                                                     class="card-img-top img-fluid"
+                                                     alt="@team.Name logo">
+                                            </div>
+                                            <div class="card-body flex-grow-1">
+                                                <!-- Team info container -->
+                                                <h5 class="list-header">@team.Name</h5>
+                                                <p class="list-header">
+                                                    @if (!string.IsNullOrEmpty(team.OwnerId))
+                                                    {
+                                                        var userNames = ViewData["UserNames"] as Dictionary<string, string>;
+                                                        <span>Owner: @(userNames?.GetValueOrDefault(team.OwnerId) ?? "Unknown")</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted">Un-Owned</span>
+                                                    }
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Right Side - Athletes List -->
+                                        <div class="col-md-6 d-flex flex-column">
+                                            <div class="athletes-list flex-grow-1">
+                                                <!-- Changed to flex-grow-1 -->
+                                                <h6 class="list-header">Athletes</h6>
+                                                <ol class="athlete-items">
+                                                    @for (int i = 1; i <= 8; i++)
+                                                    {
+                                                        var athlete = team.Athletes?.ElementAtOrDefault(i - 1);
+                                                        <li>
+                                                            @if (athlete != null)
+                                                            {
+                                                                <span>@athlete.Name</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span class="text-muted">Available</span>
+                                                            }
+                                                        </li>
+                                                    }
+                                                </ol>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <!-- Empty slot if less than 8 teams -->
+                            <div class="team-col">
+                                <div class="card team-card empty-slot h-100">
+                                    <div class="card-body text-center d-flex flex-column justify-content-center">
+                                        <i class="fas fa-plus mb-2"></i>
+                                        <p class="mb-0">Add Team</p>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info mt-4">
+            No teams found for this league.
+        </div>
+    }
+    }
+    else
+    {
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Welcome to Fantasy Sports!</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>You haven't joined or created a league yet. Would you like to:</p>
+
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header bg-primary text-white">
+                                        <h4>Join a League</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <form method="post" asp-page-handler="JoinLeague">
+                                            <div class="form-group">
+                                                <label for="LeagueCode">League Code</label>
+                                                <input type="text" class="form-control" id="LeagueCode"
+                                                       asp-for="LeagueCode" placeholder="Enter league code">
+                                                <span asp-validation-for="LeagueCode" class="text-danger"></span>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary mt-2">Join League</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header bg-success text-white">
+                                        <h4>Create a League</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <form method="post" asp-page-handler="CreateLeague">
+                                            <div class="form-group">
+                                                <label for="LeagueName">League Name</label>
+                                                <input type="text" class="form-control" id="LeagueName"
+                                                       asp-for="LeagueName" placeholder="Enter league name">
+                                                <span asp-validation-for="LeagueName" class="text-danger"></span>
+                                            </div>
+                                            <button type="submit" class="btn btn-success mt-2">Create League</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
 </div>
 
-<div class="league-content">
-    <div class="upcoming-events">
-        <h3>Upcoming Events</h3>
-        <!-- Placeholder for events calendar -->
-    </div>
-    <div class="recent-activity">
-        <h3>Recent Activity</h3>
-        <!-- Placeholder for activity feed -->
-    </div>
-</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+<style>
+    .card-body {
+        padding: 10px;
+    }
+
+    /* Grid Layout */
+    .team-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .team-row {
+        display: flex;
+        gap: 20px;
+    }
+
+    .team-col {
+        flex: 1;
+        min-width: 0;
+    }
+
+    /* Card Styling */
+    .team-card {
+        transition: all 0.3s ease;
+        border: 1px solid #dee2e6;
+    }
+
+        .team-card:hover {
+            transform: scale(0.95);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .team-card.empty-slot {
+            background-color: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            color: #6c757d;
+        }
+
+    .card-img-top {
+        max-height: 120px;
+        object-fit: contain;
+        padding: 10px;
+    }
+
+    /* Athletes List Styling */
+    .athletes-list {
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto; /* Added for scroll if needed */
+    }
+
+    .list-header {
+        font-size: 0.9rem;
+        font-weight: bold;
+        margin-bottom: 10px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 5px;
+    }
+
+    .athlete-items {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 5px; /* Added spacing between items */
+    }
+
+    .athlete-items li {
+        padding: 3px 0;
+        font-size: 0.85rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .card {
+        margin-bottom: 20px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    /* Responsive adjustments */
+    @@media (max-width: 992px) {
+        .team-row {
+            flex-wrap: wrap;
+        }
+
+        .team-col {
+            flex: 0 0 48%;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .team-card .row > div {
+            width: 100%;
+        }
+
+        .athletes-list {
+            border-top: 1px solid #eee;
+            margin-top: 10px;
+        }
+
+        .team-card {
+            height: auto !important;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .team-col {
+            flex: 0 0 100%;
+        }
+    }
+</style>

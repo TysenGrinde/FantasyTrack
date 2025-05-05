@@ -1,0 +1,100 @@
+﻿@page
+@model FantasySports.Pages.League.MyTeamModel
+@{
+    ViewData["Title"] = "My Team";
+    Layout = "_Layout";
+}
+
+<div class="container">
+    <h1>My Team</h1>
+
+    @if (Model.MyTeam != null)
+    {
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3>@Model.MyTeam.Name</h3>
+                        <p class="mb-0">League: @Model.CurrentLeague.Name</p>
+                    </div>
+                    <div class="card-body">
+                        <img src="@(Model.MyTeam.LogoUrl ?? "/images/teams/default.png")"
+                             class="img-fluid mb-3"
+                             style="max-height: 150px;"
+                             alt="@Model.MyTeam.Name logo">
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>My Athletes</h3>
+                    </div>
+                    <div class="card-body">
+                        @if (Model.MyTeam.Athletes?.Any() == true)
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Position</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var athlete in Model.MyTeam.Athletes)
+                                        {
+                                            <tr>
+                                                <td>@athlete.Name</td>
+                                                <td>@athlete.Position</td>
+                                                <td>
+                                                    <form method="post" asp-page-handler="DropAthlete">
+                                                        <input type="hidden" name="athleteId" value="@athlete.Id" />
+                                                        <button type="submit" class="btn btn-danger btn-sm">Drop</button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-info">
+                                No athletes on your team yet.
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .card {
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+
+        .card:hover {
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+
+    .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #eee;
+    }
+
+    .table th {
+        font-weight: 600;
+    }
+
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+</style>

@@ -30,17 +30,18 @@ namespace FantasySports.Pages.Leagues
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null)
             {
-                return Challenge(); // Redirect to login if not authenticated
+                return Challenge();
             }
 
             var result = await _leagueService.CreateLeague(userId, LeagueName);
+
             if (!result.Succeeded)
             {
                 ModelState.AddModelError(string.Empty, result.Error);
                 return Page();
             }
 
-            return RedirectToPage("/Leagues/Index");
+            return RedirectToPage("/League/Index");
         }
     }
 }
