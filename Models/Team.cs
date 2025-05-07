@@ -23,6 +23,7 @@ namespace FantasySports.Models
         public ICollection<Athlete> Athletes { get; set; } = new List<Athlete>();
 
         public int Wins { get; set; }
+        public int Ties { get; set; }
         public int Losses { get; set; }
 
         [NotMapped]

@@ -5,6 +5,7 @@ using FantasySports.Models;
 using System.Net.Http;
 using System.Net.Http.Json;
 using FantasySports.Data;
+using System.Security.Claims;
 
 namespace FantasySports.Pages
 {
@@ -23,7 +24,8 @@ namespace FantasySports.Pages
         }
 
         public List<Athlete> AvailableAthletes { get; set; } = new List<Athlete>();
-
+        public Team CurrentUserTeam { get; set; }
+        public List<TeamMatchup> UserTeamMatchups { get; set; } = new List<TeamMatchup>();
         public async Task OnGetAsync()
         {
             // Fetch athletes where TeamId is NULL
@@ -34,6 +36,23 @@ namespace FantasySports.Pages
                 .Include(l => l.Teams) // This is crucial to load related teams
                     .ThenInclude(t => t.Athletes) // This is crucial
                 .FirstOrDefaultAsync(l => l.Id == LeagueId); // Or your league ID
+            // Get current user's team
+            CurrentUserTeam = await _context.Teams
+                .FirstOrDefaultAsync(t => t.OwnerId == User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            if (CurrentUserTeam != null)
+            {
+                // Get matchups where the user's team participated
+                UserTeamMatchups = await _context.TeamMatchups
+                    .Include(m => m.Meet)
+                    .Include(m => m.HomeTeam)
+                    .Include(m => m.AwayTeam)
+                    .Where(m => (m.HomeTeamId == CurrentUserTeam.Id || m.AwayTeamId == CurrentUserTeam.Id)
+                                && m.HomeTeamScore.HasValue && m.AwayTeamScore.HasValue) // Use the score conditions directly
+                    .OrderByDescending(m => m.Meet.Date)
+                    .Take(3)
+                    .ToListAsync();
+            }
 
             if (CurrentLeague == null)
             {

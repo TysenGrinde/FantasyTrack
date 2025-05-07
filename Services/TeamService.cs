@@ -159,6 +159,65 @@ namespace FantasySports.Services
             await _context.SaveChangesAsync();
             return Result.Success();
         }
+        // Add these new methods for handling team records
+        public async Task<Result> UpdateTeamRecord(int teamId, bool? won = null, bool? lost = null, bool? tied = null)
+        {
+            var team = await _context.Teams.FindAsync(teamId);
+            if (team == null) return Result.Failure("Team not found");
+
+            if (won == true) team.Wins++;
+            if (lost == true) team.Losses++;
+            if (tied == true) team.Ties++;
+
+            await _context.SaveChangesAsync();
+            return Result.Success();
+        }
+
+        public async Task<Result> ProcessMatchupResult(int homeTeamId, int awayTeamId, decimal homeScore, decimal awayScore)
+        {
+            // Get both teams in a single query
+            var teams = await _context.Teams
+                .Where(t => t.Id == homeTeamId || t.Id == awayTeamId)
+                .ToListAsync();
+
+            var homeTeam = teams.FirstOrDefault(t => t.Id == homeTeamId);
+            var awayTeam = teams.FirstOrDefault(t => t.Id == awayTeamId);
+
+            if (homeTeam == null || awayTeam == null)
+                return Result.Failure("One or both teams not found");
+
+            if (homeScore > awayScore)
+            {
+                homeTeam.Wins++;
+                awayTeam.Losses++;
+            }
+            else if (awayScore > homeScore)
+            {
+                awayTeam.Wins++;
+                homeTeam.Losses++;
+            }
+            else
+            {
+                homeTeam.Ties++;
+                awayTeam.Ties++;
+            }
+
+            await _context.SaveChangesAsync();
+            return Result.Success();
+        }
+
+        public async Task<Result> ResetTeamRecord(int teamId)
+        {
+            var team = await _context.Teams.FindAsync(teamId);
+            if (team == null) return Result.Failure("Team not found");
+
+            team.Wins = 0;
+            team.Losses = 0;
+            team.Ties = 0;
+
+            await _context.SaveChangesAsync();
+            return Result.Success();
+        }
     }
     public class DraftService
     {

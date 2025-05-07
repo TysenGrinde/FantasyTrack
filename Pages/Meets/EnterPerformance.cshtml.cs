@@ -33,11 +33,24 @@ namespace FantasySports.Pages.Meets
             _athleteService = athleteService;
         }
 
-        public async Task OnGetAsync()
+        public async Task<IActionResult> OnGetAsync()
         {
             Meet = await _meetService.GetMeetWithEvents(MeetId);
-            MeetEvent = Meet.Events.FirstOrDefault(e => e.Id == EventId);
+
+            if (Meet == null)
+            {
+                return NotFound($"Meet with ID {MeetId} not found.");
+            }
+
+            MeetEvent = Meet.Events?.FirstOrDefault(e => e.Id == EventId);
+
+            if (MeetEvent == null)
+            {
+                return NotFound($"Event with ID {EventId} not found in Meet {MeetId}.");
+            }
+
             AvailableAthletes = await _athleteService.GetAvailableAthletes();
+            return Page();
         }
 
         public async Task<IActionResult> OnPostAsync()
@@ -45,7 +58,7 @@ namespace FantasySports.Pages.Meets
             if (!ModelState.IsValid)
             {
                 Meet = await _meetService.GetMeetWithEvents(MeetId);
-                MeetEvent = Meet.Events.FirstOrDefault(e => e.Id == EventId);
+                MeetEvent = Meet?.Events?.FirstOrDefault(e => e.Id == EventId); // Null-safe
                 AvailableAthletes = await _athleteService.GetAvailableAthletes();
                 return Page();
             }

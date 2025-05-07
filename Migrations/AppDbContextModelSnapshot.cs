@@ -358,6 +358,9 @@ namespace FantasySports.Migrations
                     b.Property<string>("OwnerId")
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("Ties")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("Wins")
                         .HasColumnType("INTEGER");
 

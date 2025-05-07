@@ -1,6 +1,7 @@
 ﻿using FantasySports.Data;
 using FantasySports.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace FantasySports.Services
 {
@@ -15,45 +16,41 @@ namespace FantasySports.Services
             _logger = logger;
         }
 
-        public async Task CalculateMeetScores(int meetId)
+        public async Task CalculateMeetScores(int meetId, IDbContextTransaction transaction = null)
         {
-            await using var transaction = await _context.Database.BeginTransactionAsync();
-
             try
             {
+                // Load meet with all required relationships
                 var meet = await _context.Meets
                     .Include(m => m.Events)
-                        .ThenInclude(me => me.Event)
+                        .ThenInclude(e => e.Event) // Crucial - was missing before
                     .Include(m => m.Events)
-                        .ThenInclude(me => me.Performances)
-                    .FirstAsync(m => m.Id == meetId);
+                        .ThenInclude(e => e.Performances)
+                    .Include(m => m.TeamScores)
+                    .FirstOrDefaultAsync(m => m.Id == meetId);
 
-                // Get all teams that participated in this meet
-                var participatingTeamIds = meet.Events
-                    .SelectMany(e => e.Performances)
-                    .Select(p => p.TeamIdAtTime)
-                    .Distinct()
-                    .ToList();
+                if (meet == null)
+                    throw new ArgumentException($"Meet {meetId} not found");
 
-                // Get valid teams from database
-                var validTeams = await _context.Teams
-                    .Where(t => participatingTeamIds.Contains(t.Id))
-                    .ToListAsync();
-
-                // Clear any existing scores
+                // Clear existing scores
                 var existingScores = _context.TeamScores.Where(ts => ts.MeetId == meetId);
                 _context.TeamScores.RemoveRange(existingScores);
 
-                // Calculate for each event
+                // Calculate scores for each event
                 foreach (var meetEvent in meet.Events)
                 {
+                    if (meetEvent.Event == null)
+                    {
+                        _logger.LogWarning($"Event not loaded for MeetEvent {meetEvent.Id}");
+                        continue;
+                    }
+
                     await CalculateEventScores(meetEvent);
                 }
 
-                // Calculate team totals only for valid teams
+                // Calculate team totals
                 var teamScores = meet.Events
                     .SelectMany(e => e.Performances)
-                    .Where(p => validTeams.Any(t => t.Id == p.TeamIdAtTime)) // Filter for valid teams
                     .GroupBy(p => p.TeamIdAtTime)
                     .Select(g => new TeamScore
                     {
@@ -71,7 +68,6 @@ namespace FantasySports.Services
                 {
                     if (i > 0 && teamScores[i].TotalPoints == teamScores[i - 1].TotalPoints)
                     {
-                        // Same as previous team
                         teamScores[i].Placement = teamScores[i - 1].Placement;
                     }
                     else
@@ -83,22 +79,23 @@ namespace FantasySports.Services
 
                 await _context.TeamScores.AddRangeAsync(teamScores);
                 await _context.SaveChangesAsync();
-                await transaction.CommitAsync();
-
-                _logger.LogInformation("Successfully finalized meet {MeetId}", meetId);
             }
             catch (Exception ex)
             {
-                await transaction.RollbackAsync();
-                _logger.LogError(ex, "Failed to finalize meet {MeetId}", meetId);
+                _logger.LogError(ex, $"Error calculating scores for meet {meetId}");
                 throw;
             }
-            var schedulingService = new MeetSchedulingService(_context);
-            await schedulingService.FinalizeMeetResults(meetId);
         }
 
         private async Task CalculateEventScores(MeetEvent meetEvent)
         {
+            // Add null check for meetEvent.Event
+            if (meetEvent?.Event == null)
+            {
+                _logger.LogWarning("MeetEvent or Event is null");
+                return;
+            }
+
             var isTimedEvent = meetEvent.Event.Unit == "seconds";
             var orderedPerformances = isTimedEvent
                 ? meetEvent.Performances.OrderBy(p => p.Result)

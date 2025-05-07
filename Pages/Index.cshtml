@@ -10,7 +10,7 @@
         <h4>Team Management</h4>
         <ul class="list-unstyled">
             <li>
-                <a asp-page="/League/MyTeam" style="text-decoration: none; color: black;">
+                <a asp-page="/League/MyTeam/Index" style="text-decoration: none; color: black;">
                     <i class="fas fa-users" style="margin-right: 8px;"></i>My Team
                 </a>
             </li>
@@ -104,36 +104,73 @@
             </div>
         </div>
 
-        <!-- Head to Head Section -->
+        <!-- Head to Head Section - Updated -->
         <h4>Recent Head to Head</h4>
-        <div class="center-card mb-3">
-            <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 8px;">
-                <span>2025-04-10</span> <!-- Date of the matchup -->
-                <span style="font-weight: bold;">Final</span> <!-- "Final" text -->
-            </div>
-            <div style="display: flex; justify-content: space-between; font-size: 1rem;">
-                <span>
-                    <i class="fas fa-dragon" style="color: red; margin-right: 8px;"></i>Team A 120
-                </span> <!-- Team A's icon, name, and score -->
-                <span>
-                    110 Team B<i class="fas fa-horse" style="color: blue; margin-left: 8px;"></i>
-                </span> <!-- Team B's score, name, and icon -->
-            </div>
-        </div>
-        <div class="center-card mb-3">
-            <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 8px;">
-                <span>2025-04-09</span>
-                <span style="font-weight: bold;">Final</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; font-size: 1rem;">
-                <span>
-                    <i class="fas fa-crow" style="color: black; margin-right: 8px;"></i>Team C 95
-                </span>
-                <span>
-                    100 Team D<i class="fas fa-frog" style="color: green; margin-left: 8px;"></i>
-                </span>
-            </div>
-        </div>
+        @if (Model.UserTeamMatchups.Any())
+        {
+            @foreach (var matchup in Model.UserTeamMatchups.OrderByDescending(m => m.Meet.Date).Take(3))
+            {
+                <div class="center-card mb-3">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 8px;">
+                        <span>@matchup.Meet.Date.ToString("yyyy-MM-dd")</span>
+                        <span style="font-weight: bold;">Final</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 1rem;">
+                        <span>
+                            @if (matchup.HomeTeam.Id == Model.CurrentUserTeam.Id)
+                            {
+                                <div><strong>
+                                    <img src="@matchup.HomeTeam.LogoUrl" style="height: 40px; width: 40px; margin-right: 10px; object-fit: contain;" />
+                                    @matchup.HomeTeam.Name (@matchup.HomeTeamScore)
+                                </strong></div>
+                            }
+                            else
+                            {
+                                <div>
+                                        <img src="@matchup.HomeTeam.LogoUrl" style="height: 40px; width: 40px; margin-right: 10px; object-fit: contain;" />
+                                        @matchup.HomeTeam.Name (@matchup.HomeTeamScore)
+                                </div>
+                            }
+                        </span>
+                        <span>
+                            @if (matchup.AwayTeam.Id == Model.CurrentUserTeam.Id)
+                            {
+                                <strong><div>
+                                    (@matchup.AwayTeamScore) @matchup.AwayTeam.Name
+                                    <img src="@matchup.AwayTeam.LogoUrl" style="height: 40px; width: 40px; margin-right: 10px; object-fit: contain;" />
+                                </div></strong>
+                            }
+                            else
+                            {
+                                <div>
+                                    (@matchup.AwayTeamScore) @matchup.AwayTeam.Name
+                                    <img src="@matchup.AwayTeam.LogoUrl" style="height: 40px; width: 40px; margin-right: 10px; object-fit: contain;" />
+                                </div>
+                            }
+                        </span>
+                    </div>
+                    <div style="text-align: center; margin-top: 8px;">
+                        @if (matchup.HomeTeamScore == matchup.AwayTeamScore)
+                        {
+                            <span class="badge bg-info">TIED</span>
+                        }
+                        else if ((matchup.HomeTeamScore > matchup.AwayTeamScore && matchup.HomeTeam.Id == Model.CurrentUserTeam.Id) ||
+                        (matchup.AwayTeamScore > matchup.HomeTeamScore && matchup.AwayTeam.Id == Model.CurrentUserTeam.Id))
+                        {
+                            <span class="badge bg-success">WIN</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">LOSS</span>
+                        }
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="alert alert-info">No recent matchups found for your team.</div>
+        }
     </div>
 
     <!-- Right Side: Available Athletes -->

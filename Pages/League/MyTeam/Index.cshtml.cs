@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace FantasySports.Pages.League
+namespace FantasySports.Pages.League.MyTeam
 {
-    public class MyTeamModel : PageModel
+    public class IndexModel : PageModel
     {
         private readonly AppDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
@@ -17,7 +17,7 @@ namespace FantasySports.Pages.League
         public Team MyTeam { get; set; }
         public Models.League CurrentLeague { get; set; }
 
-        public MyTeamModel(AppDbContext context, UserManager<ApplicationUser> userManager)
+        public IndexModel(AppDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _userManager = userManager;

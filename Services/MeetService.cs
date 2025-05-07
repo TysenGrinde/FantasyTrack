@@ -23,7 +23,8 @@ namespace FantasySports.Services
                 Name = name,
                 Date = date,
                 IsCompleted = false,
-                Events = eventIds.Select(e => new MeetEvent { EventId = e }).ToList()
+                Events = eventIds.Select(e => new MeetEvent { EventId = e }).ToList(),
+                LeagueId = 2 // Assuming a default league ID for now
             };
 
             _context.Meets.Add(meet);
@@ -50,7 +51,10 @@ namespace FantasySports.Services
         {
             return await _context.Meets
                 .Include(m => m.Events)
-                    .ThenInclude(me => me.Event)
+                    .ThenInclude(e => e.Event)
+                .Include(m => m.Events)
+                    .ThenInclude(e => e.Performances)
+                        .ThenInclude(p => p.Athlete)
                 .FirstOrDefaultAsync(m => m.Id == meetId);
         }
 
@@ -70,61 +74,124 @@ namespace FantasySports.Services
             _context.AthletePerformances.Add(performance);
             await _context.SaveChangesAsync();
         }
-        
+
         public async Task<Meet> GetMeetWithResults(int meetId)
         {
             return await _context.Meets
+                .AsNoTracking() // Prevent caching issues
                 .Include(m => m.Events)
-                    .ThenInclude(me => me.Event)
+                    .ThenInclude(e => e.Event)
                 .Include(m => m.Events)
-                    .ThenInclude(me => me.Performances)
+                    .ThenInclude(e => e.Performances)
                         .ThenInclude(p => p.Athlete)
-                            .ThenInclude(a => a.Team)
                 .Include(m => m.TeamScores)
                     .ThenInclude(ts => ts.Team)
+                .Include(m => m.Matchups)
+                    .ThenInclude(m => m.HomeTeam)
+                .Include(m => m.Matchups)
+                    .ThenInclude(m => m.AwayTeam)
                 .FirstOrDefaultAsync(m => m.Id == meetId);
         }
 
         public async Task FinalizeMeet(int meetId)
         {
+            // Use a transaction for the entire operation
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
             try
             {
+                // Load ALL required data in a single query
                 var meet = await _context.Meets
                     .Include(m => m.Events)
-                        .ThenInclude(me => me.Performances)
+                        .ThenInclude(e => e.Event)
+                    .Include(m => m.Events)
+                        .ThenInclude(e => e.Performances)
+                    .Include(m => m.TeamScores)
+                        .ThenInclude(ts => ts.Team)
+                    .Include(m => m.Matchups)
+                        .ThenInclude(m => m.HomeTeam)
+                    .Include(m => m.Matchups)
+                        .ThenInclude(m => m.AwayTeam)
                     .FirstOrDefaultAsync(m => m.Id == meetId);
 
                 if (meet == null)
-                {
-                    throw new ArgumentException($"Meet with ID {meetId} not found");
-                }
+                    throw new ArgumentException($"Meet {meetId} not found");
 
                 if (meet.IsCompleted)
                 {
-                    throw new InvalidOperationException("Meet is already finalized");
+                    _logger.LogInformation($"Meet {meetId} already finalized");
+                    return;
                 }
 
-                // Verify all events have performances
-                foreach (var meetEvent in meet.Events)
+                // Calculate scores
+                var scoringService = new MeetScoringService(_context,
+                    _context.GetService<ILogger<MeetScoringService>>());
+                await scoringService.CalculateMeetScores(meetId, transaction);
+
+                // In the FinalizeMeet method, replace the team record update logic with:
+                var teamService = new TeamService(_context);
+                foreach (var matchup in meet.Matchups)
                 {
-                    if (!meetEvent.Performances.Any())
-                    {
-                        throw new InvalidOperationException(
-                            $"Event {meetEvent.Event?.Name} has no performances recorded");
-                    }
+                    var homeScore = meet.TeamScores
+                        .FirstOrDefault(ts => ts.TeamId == matchup.HomeTeamId)?.TotalPoints ?? 0;
+                    var awayScore = meet.TeamScores
+                        .FirstOrDefault(ts => ts.TeamId == matchup.AwayTeamId)?.TotalPoints ?? 0;
+
+                    matchup.HomeTeamScore = homeScore;
+                    matchup.AwayTeamScore = awayScore;
+
+                    // Use the TeamService to update records
+                    await teamService.ProcessMatchupResult(
+                        matchup.HomeTeamId,
+                        matchup.AwayTeamId,
+                        homeScore,
+                        awayScore);
                 }
 
-                var scoringServiceLogger = _context.GetService<ILogger<MeetScoringService>>();
-                var scoringService = new MeetScoringService(_context, scoringServiceLogger);
-                await scoringService.CalculateMeetScores(meetId);
-
+                // Finalize meet
                 meet.IsCompleted = true;
                 await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                _logger.LogInformation($"Successfully finalized meet {meetId}");
             }
             catch (Exception ex)
             {
-                throw; // Re-throw to show error in UI
+                await transaction.RollbackAsync();
+                _logger.LogError(ex, $"Error finalizing meet {meetId}");
+                throw;
             }
+        }
+
+        public async Task ScheduleMeetMatchups(int meetId)
+        {
+            var meet = await _context.Meets
+                .Include(m => m.League)
+                    .ThenInclude(l => l.Teams)
+                .FirstOrDefaultAsync(m => m.Id == meetId);
+
+            if (meet == null || meet.League?.Teams == null)
+                throw new Exception("Meet or teams not found");
+
+            var teams = meet.League.Teams.ToList();
+            var matchups = new List<TeamMatchup>();
+
+            // Simple round-robin pairing
+            for (int i = 0; i < teams.Count; i++)
+            {
+                for (int j = i + 1; j < teams.Count; j++)
+                {
+                    matchups.Add(new TeamMatchup
+                    {
+                        MeetId = meetId,
+                        HomeTeamId = teams[i].Id,
+                        AwayTeamId = teams[j].Id
+                    });
+                }
+            }
+
+            _context.TeamMatchups.AddRange(matchups);
+            await _context.SaveChangesAsync();
         }
     }
 }
