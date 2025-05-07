@@ -26,7 +26,7 @@ namespace FantasySports.Models
         public ApplicationUser? Creator { get; set; } = null!;
         public ICollection<LeagueMember> Members { get; set; } = new List<LeagueMember>();
         public ICollection<Team> Teams { get; set; } = new List<Team>();
-        public ICollection<MeetSchedule> MeetSchedules { get; set; } = new List<MeetSchedule>();
+        public ICollection<Meet> Meets { get; set; } = new List<Meet>();
         public ICollection<Trade> Trades { get; set; } = new List<Trade>();
     }
 }

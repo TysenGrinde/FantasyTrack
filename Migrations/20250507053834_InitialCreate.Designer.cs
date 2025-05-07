@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FantasySports.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250505043047_AddTeamModels")]
-    partial class AddTeamModels
+    [Migration("20250507053834_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -144,6 +144,55 @@ namespace FantasySports.Migrations
                     b.ToTable("AthleteEvent");
                 });
 
+            modelBuilder.Entity("FantasySports.Models.AthletePerformance", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("AthleteId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("MeetEventId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("PointsEarned")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("Result")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("TeamIdAtTime")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AthleteId");
+
+                    b.HasIndex("MeetEventId");
+
+                    b.ToTable("AthletePerformances");
+                });
+
+            modelBuilder.Entity("FantasySports.Models.Event", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Unit")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Events");
+                });
+
             modelBuilder.Entity("FantasySports.Models.League", b =>
                 {
                     b.Property<int>("Id")
@@ -154,7 +203,6 @@ namespace FantasySports.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("CreatorId")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("DraftDate")
@@ -162,6 +210,9 @@ namespace FantasySports.Migrations
 
                     b.Property<string>("DraftOrder")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("InviteCode")
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsDraftComplete")
@@ -214,6 +265,53 @@ namespace FantasySports.Migrations
                     b.ToTable("LeagueMembers");
                 });
 
+            modelBuilder.Entity("FantasySports.Models.Meet", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("LeagueId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LeagueId");
+
+                    b.ToTable("Meets");
+                });
+
+            modelBuilder.Entity("FantasySports.Models.MeetEvent", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("EventId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("MeetId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId");
+
+                    b.HasIndex("MeetId");
+
+                    b.ToTable("MeetEvents");
+                });
+
             modelBuilder.Entity("FantasySports.Models.MeetSchedule", b =>
                 {
                     b.Property<int>("Id")
@@ -253,13 +351,18 @@ namespace FantasySports.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("Losses")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("OwnerId")
-                        .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("Wins")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -268,6 +371,68 @@ namespace FantasySports.Migrations
                     b.HasIndex("OwnerId");
 
                     b.ToTable("Teams");
+                });
+
+            modelBuilder.Entity("FantasySports.Models.TeamMatchup", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("AwayTeamId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("AwayTeamScore")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("HomeTeamId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("HomeTeamScore")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("MeetId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AwayTeamId");
+
+                    b.HasIndex("HomeTeamId");
+
+                    b.HasIndex("MeetId");
+
+                    b.ToTable("TeamMatchups");
+                });
+
+            modelBuilder.Entity("FantasySports.Models.TeamScore", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("MeetId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Placement")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("TeamId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("TotalPoints")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MeetId");
+
+                    b.HasIndex("TeamId");
+
+                    b.ToTable("TeamScores");
                 });
 
             modelBuilder.Entity("FantasySports.Models.Trade", b =>
@@ -465,13 +630,30 @@ namespace FantasySports.Migrations
                     b.Navigation("Athlete");
                 });
 
+            modelBuilder.Entity("FantasySports.Models.AthletePerformance", b =>
+                {
+                    b.HasOne("FantasySports.Models.Athlete", "Athlete")
+                        .WithMany()
+                        .HasForeignKey("AthleteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FantasySports.Models.MeetEvent", "MeetEvent")
+                        .WithMany("Performances")
+                        .HasForeignKey("MeetEventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Athlete");
+
+                    b.Navigation("MeetEvent");
+                });
+
             modelBuilder.Entity("FantasySports.Models.League", b =>
                 {
                     b.HasOne("FantasySports.Models.ApplicationUser", "Creator")
                         .WithOne("CreatedLeague")
-                        .HasForeignKey("FantasySports.Models.League", "CreatorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("FantasySports.Models.League", "CreatorId");
 
                     b.Navigation("Creator");
                 });
@@ -503,10 +685,40 @@ namespace FantasySports.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("FantasySports.Models.Meet", b =>
+                {
+                    b.HasOne("FantasySports.Models.League", "League")
+                        .WithMany("Meets")
+                        .HasForeignKey("LeagueId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("League");
+                });
+
+            modelBuilder.Entity("FantasySports.Models.MeetEvent", b =>
+                {
+                    b.HasOne("FantasySports.Models.Event", "Event")
+                        .WithMany()
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FantasySports.Models.Meet", "Meet")
+                        .WithMany("Events")
+                        .HasForeignKey("MeetId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Event");
+
+                    b.Navigation("Meet");
+                });
+
             modelBuilder.Entity("FantasySports.Models.MeetSchedule", b =>
                 {
                     b.HasOne("FantasySports.Models.League", "League")
-                        .WithMany("MeetSchedules")
+                        .WithMany()
                         .HasForeignKey("LeagueId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -524,13 +736,57 @@ namespace FantasySports.Migrations
 
                     b.HasOne("FantasySports.Models.ApplicationUser", "Owner")
                         .WithMany("Teams")
-                        .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("OwnerId");
 
                     b.Navigation("League");
 
                     b.Navigation("Owner");
+                });
+
+            modelBuilder.Entity("FantasySports.Models.TeamMatchup", b =>
+                {
+                    b.HasOne("FantasySports.Models.Team", "AwayTeam")
+                        .WithMany()
+                        .HasForeignKey("AwayTeamId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FantasySports.Models.Team", "HomeTeam")
+                        .WithMany()
+                        .HasForeignKey("HomeTeamId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FantasySports.Models.Meet", "Meet")
+                        .WithMany("Matchups")
+                        .HasForeignKey("MeetId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AwayTeam");
+
+                    b.Navigation("HomeTeam");
+
+                    b.Navigation("Meet");
+                });
+
+            modelBuilder.Entity("FantasySports.Models.TeamScore", b =>
+                {
+                    b.HasOne("FantasySports.Models.Meet", "Meet")
+                        .WithMany("TeamScores")
+                        .HasForeignKey("MeetId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FantasySports.Models.Team", "Team")
+                        .WithMany()
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Meet");
+
+                    b.Navigation("Team");
                 });
 
             modelBuilder.Entity("FantasySports.Models.Trade", b =>
@@ -623,13 +879,27 @@ namespace FantasySports.Migrations
 
             modelBuilder.Entity("FantasySports.Models.League", b =>
                 {
-                    b.Navigation("MeetSchedules");
+                    b.Navigation("Meets");
 
                     b.Navigation("Members");
 
                     b.Navigation("Teams");
 
                     b.Navigation("Trades");
+                });
+
+            modelBuilder.Entity("FantasySports.Models.Meet", b =>
+                {
+                    b.Navigation("Events");
+
+                    b.Navigation("Matchups");
+
+                    b.Navigation("TeamScores");
+                });
+
+            modelBuilder.Entity("FantasySports.Models.MeetEvent", b =>
+                {
+                    b.Navigation("Performances");
                 });
 
             modelBuilder.Entity("FantasySports.Models.Team", b =>

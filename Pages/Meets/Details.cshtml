@@ -98,6 +98,55 @@ else
     </div>
 }
 
+    @if (Model.Meet.Matchups.Any())
+    {
+        <div class="card mt-4">
+            <div class="card-header">
+                <h4>Team Matchups</h4>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Home Team</th>
+                            <th>Score</th>
+                            <th>Away Team</th>
+                            <th>Score</th>
+                            <th>Result</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var matchup in Model.Meet.Matchups)
+                        {
+                            <tr>
+                                <td>@matchup.HomeTeam.Name</td>
+                                <td>@(matchup.HomeTeamScore?.ToString() ?? "-")</td>
+                                <td>@matchup.AwayTeam.Name</td>
+                                <td>@(matchup.AwayTeamScore?.ToString() ?? "-")</td>
+                                <td>
+                                    @if (matchup.IsCompleted)
+                                    {
+                                        <span class="badge @(matchup.HomeTeamScore > matchup.AwayTeamScore ? "bg-success" : "bg-danger")">
+                                            @(matchup.HomeTeamScore > matchup.AwayTeamScore ? "W" : "L")
+                                        </span>
+                                        <span> vs </span>
+                                        <span class="badge @(matchup.AwayTeamScore > matchup.HomeTeamScore ? "bg-success" : "bg-danger")">
+                                            @(matchup.AwayTeamScore > matchup.HomeTeamScore ? "W" : "L")
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Pending</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+
 @if (Model.Meet.IsCompleted)
 {
     <div class="card">

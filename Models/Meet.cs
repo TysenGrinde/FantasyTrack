@@ -6,7 +6,12 @@
         public string Name { get; set; }
         public DateTime Date { get; set; }
         public bool IsCompleted { get; set; }
+        public int LeagueId { get; set; }
+
+        // Navigation properties
+        public League League { get; set; }
         public ICollection<MeetEvent> Events { get; set; } = new List<MeetEvent>();
         public ICollection<TeamScore> TeamScores { get; set; } = new List<TeamScore>();
+        public ICollection<TeamMatchup> Matchups { get; set; } = new List<TeamMatchup>();
     }
 }

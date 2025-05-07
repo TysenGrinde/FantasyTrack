@@ -93,6 +93,8 @@ namespace FantasySports.Services
                 _logger.LogError(ex, "Failed to finalize meet {MeetId}", meetId);
                 throw;
             }
+            var schedulingService = new MeetSchedulingService(_context);
+            await schedulingService.FinalizeMeetResults(meetId);
         }
 
         private async Task CalculateEventScores(MeetEvent meetEvent)

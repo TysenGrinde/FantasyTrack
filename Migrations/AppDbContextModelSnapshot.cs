@@ -274,11 +274,16 @@ namespace FantasySports.Migrations
                     b.Property<bool>("IsCompleted")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("LeagueId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("LeagueId");
 
                     b.ToTable("Meets");
                 });
@@ -363,6 +368,38 @@ namespace FantasySports.Migrations
                     b.HasIndex("OwnerId");
 
                     b.ToTable("Teams");
+                });
+
+            modelBuilder.Entity("FantasySports.Models.TeamMatchup", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("AwayTeamId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("AwayTeamScore")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("HomeTeamId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("HomeTeamScore")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("MeetId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AwayTeamId");
+
+                    b.HasIndex("HomeTeamId");
+
+                    b.HasIndex("MeetId");
+
+                    b.ToTable("TeamMatchups");
                 });
 
             modelBuilder.Entity("FantasySports.Models.TeamScore", b =>
@@ -645,6 +682,17 @@ namespace FantasySports.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("FantasySports.Models.Meet", b =>
+                {
+                    b.HasOne("FantasySports.Models.League", "League")
+                        .WithMany("Meets")
+                        .HasForeignKey("LeagueId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("League");
+                });
+
             modelBuilder.Entity("FantasySports.Models.MeetEvent", b =>
                 {
                     b.HasOne("FantasySports.Models.Event", "Event")
@@ -667,7 +715,7 @@ namespace FantasySports.Migrations
             modelBuilder.Entity("FantasySports.Models.MeetSchedule", b =>
                 {
                     b.HasOne("FantasySports.Models.League", "League")
-                        .WithMany("MeetSchedules")
+                        .WithMany()
                         .HasForeignKey("LeagueId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -690,6 +738,33 @@ namespace FantasySports.Migrations
                     b.Navigation("League");
 
                     b.Navigation("Owner");
+                });
+
+            modelBuilder.Entity("FantasySports.Models.TeamMatchup", b =>
+                {
+                    b.HasOne("FantasySports.Models.Team", "AwayTeam")
+                        .WithMany()
+                        .HasForeignKey("AwayTeamId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FantasySports.Models.Team", "HomeTeam")
+                        .WithMany()
+                        .HasForeignKey("HomeTeamId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FantasySports.Models.Meet", "Meet")
+                        .WithMany("Matchups")
+                        .HasForeignKey("MeetId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AwayTeam");
+
+                    b.Navigation("HomeTeam");
+
+                    b.Navigation("Meet");
                 });
 
             modelBuilder.Entity("FantasySports.Models.TeamScore", b =>
@@ -801,7 +876,7 @@ namespace FantasySports.Migrations
 
             modelBuilder.Entity("FantasySports.Models.League", b =>
                 {
-                    b.Navigation("MeetSchedules");
+                    b.Navigation("Meets");
 
                     b.Navigation("Members");
 
@@ -813,6 +888,8 @@ namespace FantasySports.Migrations
             modelBuilder.Entity("FantasySports.Models.Meet", b =>
                 {
                     b.Navigation("Events");
+
+                    b.Navigation("Matchups");
 
                     b.Navigation("TeamScores");
                 });
