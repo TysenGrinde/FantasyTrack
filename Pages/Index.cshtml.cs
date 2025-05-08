@@ -24,6 +24,7 @@ namespace FantasySports.Pages
         }
 
         public List<Athlete> AvailableAthletes { get; set; } = new List<Athlete>();
+        public List<Team> teams { get; set; } = new List<Team>();
         public Team CurrentUserTeam { get; set; }
         public List<TeamMatchup> UserTeamMatchups { get; set; } = new List<TeamMatchup>();
         public async Task OnGetAsync()
@@ -33,12 +34,17 @@ namespace FantasySports.Pages
                 .Where(a => a.TeamId == null)
                 .ToListAsync();
             CurrentLeague = await _context.Leagues
-                .Include(l => l.Teams) // This is crucial to load related teams
-                    .ThenInclude(t => t.Athletes) // This is crucial
-                .FirstOrDefaultAsync(l => l.Id == LeagueId); // Or your league ID
+                .Include(l => l.Teams) // load related teams
+                    .ThenInclude(t => t.Athletes)
+                .FirstOrDefaultAsync(l => l.Id == LeagueId);
             // Get current user's team
             CurrentUserTeam = await _context.Teams
                 .FirstOrDefaultAsync(t => t.OwnerId == User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            teams = await _context.Teams
+                .Include(t => t.Athletes)
+                .Where(t => t.Id != -1)
+                .ToListAsync();
 
             if (CurrentUserTeam != null)
             {

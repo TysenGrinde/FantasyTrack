@@ -7,42 +7,38 @@
 <div class="container-fluid" style="display: flex; width: 100%; height: 100vh; margin: 0; padding: 0;">
     <!-- Left Side: Navigation Links -->
     <div class="bg-light p-3" style="flex: 0 0 20%; min-height: 100vh;">
-        <h4>Team Management</h4>
+        <h4 class="mb-4 border-bottom pb-2">
+            <i class="fas fa-rocket me-2"></i>Quick Links
+        </h4>
         <ul class="list-unstyled">
-            <li>
-                <a asp-page="/League/MyTeam/Index" style="text-decoration: none; color: black;">
-                    <i class="fas fa-users" style="margin-right: 8px;"></i>My Team
+            <li class="mb-2">
+                <a asp-page="/League/MyTeam/Index" class="d-flex align-items-center p-2 rounded link-hover">
+                    <i class="fas fa-users me-3" style="width: 24px; text-align: center;"></i>
+                    <span>My Team</span>
                 </a>
             </li>
-            <li>
-                <a href="#" style="text-decoration: none; color: black;">
-                    <i class="fas fa-chart-bar" style="margin-right: 8px;"></i>Statistics
+            <li class="mb-2">
+                <a asp-page="/Athletes/Index" class="d-flex align-items-center p-2 rounded link-hover">
+                    <i class="fas fa-running me-3" style="width: 24px; text-align: center;"></i>
+                    <span>Athletes</span>
                 </a>
             </li>
-        </ul>
-        <h4>Draft</h4>
-        <ul class="list-unstyled">
-            <li>
-                <a href="#" style="text-decoration: none; color: black;">
-                    <i class="fas fa-list-ol" style="margin-right: 8px;"></i>Draft Order
+            <li class="mb-2">
+                <a asp-page="/League/Index" class="d-flex align-items-center p-2 rounded link-hover">
+                    <i class="fas fa-trophy me-3" style="width: 24px; text-align: center;"></i>
+                    <span>League Home</span>
                 </a>
             </li>
-            <li>
-                <a href="#" style="text-decoration: none; color: black;">
-                    <i class="fas fa-history" style="margin-right: 8px;"></i>Draft History
+            <li class="mb-2">
+                <a asp-page="/League/Meets/Index" class="d-flex align-items-center p-2 rounded link-hover">
+                    <i class="fas fa-calendar-alt me-3" style="width: 24px; text-align: center;"></i>
+                    <span>Meets</span>
                 </a>
             </li>
-        </ul>
-        <h4>Trades</h4>
-        <ul class="list-unstyled">
-            <li>
-                <a href="#" style="text-decoration: none; color: black;">
-                    <i class="fas fa-exchange-alt" style="margin-right: 8px;"></i>Propose a Trade
-                </a>
-            </li>
-            <li>
-                <a href="#" style="text-decoration: none; color: black;">
-                    <i class="fas fa-clock" style="margin-right: 8px;"></i>Pending Trades
+            <li class="mb-2">
+                <a asp-page="/League/Meets/Create" class="d-flex align-items-center p-2 rounded link-hover">
+                    <i class="fas fa-plus-circle me-3" style="width: 24px; text-align: center;"></i>
+                    <span>Add Meet</span>
                 </a>
             </li>
         </ul>
@@ -55,7 +51,7 @@
         <div class="center-card mb-3">
             <div>
                 @{
-                    var displayTeams = Model.CurrentLeague.Teams
+                    var displayTeams = Model.teams
                     .OrderByDescending(t => t.Wins)
                     .ThenBy(t => t.Losses)
                     .Take(8)
@@ -64,10 +60,11 @@
                 <table style="width: 100%; border-collapse: collapse;">
                     <thead>
                         <tr>
-                            <th style="text-align: left; width: 70%;">Teams</th>
+                            <th style="text-align: left; width: 60%;">Teams</th>
                             <th style="text-align: right; width: 10%;">W</th>
                             <th style="text-align: right; width: 10%;">L</th>
-                            <th style="text-align: right; width: 10%;">PCT</th>
+							<th style="text-align: right; width: 10%;">T</th>
+                            <th style="text-align: right; width: 10%;">W PCT</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -89,10 +86,11 @@
                                 </td>
                                 <td style="text-align: right;">@team.Wins</td>
                                 <td style="text-align: right;">@team.Losses</td>
+                                <td style="text-align: right;">@team.Ties</td>
                                 <td style="text-align: right;">
                                     @{
                                         var pct = team.Wins + team.Losses > 0
-                                        ? (team.Wins * 100.0 / (team.Wins + team.Losses)).ToString("0.0") + "%"
+                                        ? (team.Wins * 100.0 / (team.Wins + (team.Losses + team.Ties))).ToString("0.0") + "%"
                                         : "0.0%";
                                     }
                                     @pct
@@ -104,6 +102,7 @@
             </div>
         </div>
 
+        <div class="athletes-container" style="max-height: calc(100vh - 340px); overflow-y: auto;">
         <!-- Head to Head Section - Updated -->
         <h4>Recent Head to Head</h4>
         @if (Model.UserTeamMatchups.Any())
@@ -172,6 +171,7 @@
             <div class="alert alert-info">No recent matchups found for your team.</div>
         }
     </div>
+    </div>
 
     <!-- Right Side: Available Athletes -->
     <div class="bg-light p-3" style="flex: 0 0 20%; min-height: 100vh; position: relative;">
@@ -198,3 +198,25 @@
         </div>
     </div>
 </div>
+
+<style>
+    .link-hover {
+        color: #495057;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+        .link-hover:hover {
+            background-color: #e9ecef;
+            color: #0d6efd;
+            transform: translateX(5px);
+        }
+
+            .link-hover:hover i {
+                color: #0d6efd;
+            }
+
+    .rounded {
+        border-radius: 0.375rem !important;
+    }
+</style>

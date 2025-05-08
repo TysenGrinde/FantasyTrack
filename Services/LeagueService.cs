@@ -18,18 +18,13 @@ public class LeagueService
     {
         try
         {
-            // Check if user already has a league
             var existingLeague = await _context.Leagues
                 .FirstOrDefaultAsync(l => l.CreatorId == creatorId);
 
             if (existingLeague != null)
             {
-                // Option 1: Update existing league
                 existingLeague.Name = leagueName;
                 existingLeague.CreatedDate = DateTime.UtcNow;
-
-                // Option 2: Return error if you want one league per user
-                // return Result.Failure("You can only create one league");
             }
             else
             {

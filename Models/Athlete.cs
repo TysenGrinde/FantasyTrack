@@ -16,5 +16,6 @@ namespace FantasySports.Models
 
         // List of events (e.g., games, matches)
         public List<AthleteEvent> Events { get; set; } = new List<AthleteEvent>();
+        public List<AthletePerformance> Performances { get; set; } = new List<AthletePerformance>();
     }
 }

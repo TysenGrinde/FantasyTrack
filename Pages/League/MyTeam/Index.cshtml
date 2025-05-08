@@ -28,23 +28,24 @@
 
             <div class="col-md-6">
                 <div class="card">
-                    <div class="card-header">
+                    <div class="card-header d-flex justify-content-between align-items-center">
                         <h3>My Athletes</h3>
+                        <span>@Model.MyTeam.Athletes.Count/8 slots filled</span>
                     </div>
                     <div class="card-body">
-                        @if (Model.MyTeam.Athletes?.Any() == true)
-                        {
-                            <div class="table-responsive">
-                                <table class="table table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>Name</th>
-                                            <th>Position</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var athlete in Model.MyTeam.Athletes)
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Position</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        // Show existing athletes first
+                                        foreach (var athlete in Model.MyTeam.Athletes)
                                         {
                                             <tr>
                                                 <td>@athlete.Name</td>
@@ -57,21 +58,76 @@
                                                 </td>
                                             </tr>
                                         }
-                                    </tbody>
-                                </table>
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="alert alert-info">
-                                No athletes on your team yet.
-                            </div>
-                        }
+
+                                        // Show empty slots
+                                        for (int i = Model.MyTeam.Athletes.Count; i < 8; i++)
+                                        {
+                                            <tr>
+                                                <td colspan="2" class="text-muted">Empty Slot</td>
+                                                <td>
+                                                    <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addAthleteModal">
+                                                        Add Athlete
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     }
+</div>
+
+<!-- Add Athlete Modal -->
+<div class="modal fade" id="addAthleteModal" tabindex="-1" aria-labelledby="addAthleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addAthleteModalLabel">Add Athlete to Team</h5>
+                <button type="button" class="btn-close" data-bs-close="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @if (Model.AvailableAthletes?.Any() == true)
+                {
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Position</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var athlete in Model.AvailableAthletes)
+                            {
+                                <tr>
+                                    <td>@athlete.Name</td>
+                                    <td>@athlete.Position</td>
+                                    <td>
+                                        <form method="post" asp-page-handler="AddAthlete">
+                                            <input type="hidden" name="athleteId" value="@athlete.Id" />
+                                            <button type="submit" class="btn btn-primary btn-sm">Add</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <div class="alert alert-info">No available athletes to add.</div>
+                }
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <style>

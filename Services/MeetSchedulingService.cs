@@ -25,7 +25,7 @@ namespace FantasySports.Services
             if (meet?.League?.Teams == null)
                 throw new Exception("Meet or league teams not found");
 
-            var teams = meet.League.Teams.ToList();
+            var teams = meet.League.Teams.Where(t => t.Id != -1).ToList();
             Shuffle(teams);
 
             // Clear existing matchups

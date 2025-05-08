@@ -6,14 +6,14 @@ using System.Net.Http.Json;
 using Microsoft.EntityFrameworkCore;
 using FantasySports.Data;
 
-namespace FantasySports.Pages
+namespace FantasySports.Pages.Athletes
 {
-    public class AthleteModel : PageModel
+    public class IndexModel : PageModel
     {
         private readonly HttpClient _httpClient;
         private readonly AppDbContext _context;
 
-        public AthleteModel(AppDbContext context, HttpClient httpClient)
+        public IndexModel(AppDbContext context, HttpClient httpClient)
         {
             _context = context;
             _httpClient = httpClient;

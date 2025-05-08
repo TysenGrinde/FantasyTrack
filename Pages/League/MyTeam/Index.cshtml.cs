@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace FantasySports.Pages.League.MyTeam
 {
@@ -16,6 +18,7 @@ namespace FantasySports.Pages.League.MyTeam
 
         public Team MyTeam { get; set; }
         public Models.League CurrentLeague { get; set; }
+        public List<Athlete> AvailableAthletes { get; set; }
 
         public IndexModel(AppDbContext context, UserManager<ApplicationUser> userManager)
         {
@@ -45,6 +48,11 @@ namespace FantasySports.Pages.League.MyTeam
 
             CurrentLeague = MyTeam.League;
 
+            // Get available athletes (those without a team in the same league)
+            AvailableAthletes = await _context.Athletes
+                .Where(a => a.TeamId == null)
+                .ToListAsync();
+
             return Page();
         }
 
@@ -69,6 +77,49 @@ namespace FantasySports.Pages.League.MyTeam
 
             // Remove the athlete from the team
             athlete.TeamId = null;
+            await _context.SaveChangesAsync();
+
+            return RedirectToPage();
+        }
+
+        public async Task<IActionResult> OnPostAddAthleteAsync(int athleteId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return RedirectToPage("/Account/Login");
+            }
+
+            // Verify the user has a team
+            var team = await _context.Teams
+                .FirstOrDefaultAsync(t => t.OwnerId == userId);
+
+            if (team == null)
+            {
+                return NotFound("You don't have a team.");
+            }
+
+            // Check if team already has 8 athletes
+            var athleteCount = await _context.Athletes
+                .CountAsync(a => a.TeamId == team.Id);
+
+            if (athleteCount >= 8)
+            {
+                return BadRequest("Your team already has the maximum number of athletes (8).");
+            }
+
+            // Find the athlete and verify it's available
+            var athlete = await _context.Athletes
+                .FirstOrDefaultAsync(a => a.Id == athleteId && a.TeamId == null);
+
+            if (athlete == null)
+            {
+                return NotFound("Athlete not found or already on a team.");
+            }
+
+            // Add the athlete to the team
+            athlete.TeamId = team.Id;
             await _context.SaveChangesAsync();
 
             return RedirectToPage();

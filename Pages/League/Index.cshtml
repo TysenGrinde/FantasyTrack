@@ -18,7 +18,7 @@
         <!-- 4x2 Grid Container -->
         <div class="team-grid">
             @{
-                var displayTeams = Model.CurrentLeague.Teams.Take(8).ToList();
+                var displayTeams = Model.teams.Take(8).ToList();
             }
 
             @for (int row = 0; row < 2; row++)

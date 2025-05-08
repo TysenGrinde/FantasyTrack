@@ -67,7 +67,7 @@ namespace FantasySports.Services
                 MeetEventId = meetEventId,
                 AthleteId = athleteId,
                 Result = result,
-                TeamIdAtTime = athlete?.TeamId ?? 0,
+                TeamIdAtTime = athlete?.TeamId ?? -1,
                 PointsEarned = 0 // Will be calculated later
             };
 

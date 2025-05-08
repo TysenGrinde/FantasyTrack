@@ -21,6 +21,7 @@ namespace FantasySports.Pages.League
         public string LeagueName { get; set; }
         [BindProperty]
         public string LeagueCode { get; set; }
+        public List<Team> teams { get; set; } = new List<Team>();
 
         public IndexModel(AppDbContext context, UserManager<ApplicationUser> userManager)
         {
@@ -44,6 +45,11 @@ namespace FantasySports.Pages.League
                     .ThenInclude(t => t.Athletes)
                 .Include(l => l.Members)
                 .FirstOrDefaultAsync(l => l.CreatorId == userId || l.Members.Any(m => m.UserId == userId));
+
+            teams = await _context.Teams
+                .Include(t => t.Athletes)
+                .Where(t => t.Id != -1)
+                .ToListAsync();
 
             HasLeague = CurrentLeague != null;
 

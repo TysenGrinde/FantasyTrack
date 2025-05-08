@@ -46,9 +46,6 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<TeamService>();
 builder.Services.AddScoped<LeagueService>();
 
-// Add CSV import service
-builder.Services.AddScoped<CsvImportService>();
-
 // Add MeetService and MeetScoringService registration
 builder.Services.AddScoped<MeetService>();
 builder.Services.AddScoped<MeetScoringService>();
